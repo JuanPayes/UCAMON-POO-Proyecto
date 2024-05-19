@@ -15,7 +15,7 @@ public class Pokemon extends Game {
     }
     public void render() {
         Gdx.gl.glClearColor(0,0,0,1);
-        Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         super.render();
     }
