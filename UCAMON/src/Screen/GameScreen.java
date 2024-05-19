@@ -1,30 +1,40 @@
 package Screen;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import controller.PlayerController;
+import entity.Player;
 import main.Pokemon;
+import main.Settings;
 
 public class GameScreen  extends AbstractScreen {
-
-    private Texture player;
+    private PlayerController control;
+    private Player player;
+    private Texture playerStandingSouth;
     private SpriteBatch batch;
 
     public GameScreen(Pokemon app) {
         super(app);
 
-        player = new Texture("Res/SpriteTest.png");
+        playerStandingSouth = new Texture("resources/SpriteTest.png");
         batch = new SpriteBatch();
+
+        player = new Player(0,0);
+
+        control = new PlayerController(player);
     }
 
     @Override
     public void show() {
-
+        Gdx.input.setInputProcessor(control);
     }
 
     @Override
     public void render(float delta) {
     batch.begin();
-    batch.draw(player, 300, 200, 16, 16);
+    batch.draw(playerStandingSouth, player.getX()* Settings.SCALED_TILE_SIZE, player.getY()*Settings.SCALED_TILE_SIZE, Settings.SCALED_TILE_SIZE
+            , Settings.SCALED_TILE_SIZE*1.5f);
     batch.end();
     }
 
