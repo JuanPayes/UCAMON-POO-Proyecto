@@ -4,23 +4,35 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import controller.PlayerController;
-import entity.Player;
+import entity.Entity;
+import entity.TERRAIN;
+import entity.TileMap;
 import main.Pokemon;
 import main.Settings;
 
 public class GameScreen  extends AbstractScreen {
     private PlayerController control;
-    private Player player;
+    private Entity player;
     private Texture playerStandingSouth;
     private SpriteBatch batch;
 
+    private Texture Grass1;
+    private Texture BrownGrass1;
+    private Texture BrownGrass2;
+    private Texture BrownGrass3;
+    private TileMap map;
     public GameScreen(Pokemon app) {
         super(app);
 
-        playerStandingSouth = new Texture("resources/SpriteTest.png");
-        batch = new SpriteBatch();
 
-        player = new Player(0,0);
+        playerStandingSouth = new Texture("resources/SpriteTest.png");
+        Grass1 = new Texture("resources/Tiles/grass.png");
+        BrownGrass1 = new Texture("resources/Tiles/brown_path_grass_west.png");
+        BrownGrass2 = new Texture("resources/Tiles/brown_path.png");
+        BrownGrass3 = new Texture("resources/Tiles/brown_path_grass_east.png");
+        batch = new SpriteBatch();
+        map = new TileMap(20,12);
+        player = new Entity(map,0,0);
 
         control = new PlayerController(player);
     }
@@ -32,10 +44,23 @@ public class GameScreen  extends AbstractScreen {
 
     @Override
     public void render(float delta) {
-    batch.begin();
-    batch.draw(playerStandingSouth, player.getX()* Settings.SCALED_TILE_SIZE, player.getY()*Settings.SCALED_TILE_SIZE, Settings.SCALED_TILE_SIZE
-            , Settings.SCALED_TILE_SIZE*1.5f);
-    batch.end();
+        batch.begin();
+        for(int x = 0; x < map.getWidth(); x++){
+            for(int y = 0; y <map.getHeight();y++) {
+                Texture render;
+
+                if (map.getTile(x, y).getTerrain() == TERRAIN.GRASS_1) {
+                    render = Grass1;
+                }else {
+                    render = Grass1;
+                }
+                batch.draw(render,x*Settings.SCALED_TILE_SIZE,y*Settings.SCALED_TILE_SIZE,Settings.SCALED_TILE_SIZE,Settings.SCALED_TILE_SIZE);
+            }
+        }
+
+        batch.draw(playerStandingSouth, player.getX()* Settings.SCALED_TILE_SIZE, player.getY()*Settings.SCALED_TILE_SIZE, Settings.SCALED_TILE_SIZE
+                , Settings.SCALED_TILE_SIZE*1.5f);
+        batch.end();
     }
 
     @Override

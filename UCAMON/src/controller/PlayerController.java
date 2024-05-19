@@ -2,11 +2,11 @@ package controller;
 
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
-import entity.Player;
+import entity.Entity;
 
 public class PlayerController extends InputAdapter {
-    private Player player;
-    public PlayerController(Player pl){
+    private Entity player;
+    public PlayerController(Entity pl){
         this.player = pl;
     }
     @Override
