@@ -59,7 +59,7 @@ public class GameScreen  extends AbstractScreen {
         }
 
         batch.draw(playerStandingSouth, player.getX()* Settings.SCALED_TILE_SIZE, player.getY()*Settings.SCALED_TILE_SIZE, Settings.SCALED_TILE_SIZE
-                , Settings.SCALED_TILE_SIZE*1.5f);
+                , Settings.SCALED_TILE_SIZE*1.5f);//Ver dimensiones de sprite...
         batch.end();
     }
 
