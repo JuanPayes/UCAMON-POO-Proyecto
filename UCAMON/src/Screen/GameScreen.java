@@ -25,7 +25,7 @@ public class GameScreen  extends AbstractScreen {
     private TileMap map;
     public GameScreen(Pokemon app) {
         super(app);
-
+        this.control = new PlayerController(player);
 
         playerStandingSouth = new Texture("resources/SpriteTest.png");
         Grass1 = new Texture("resources/Tiles/grass.png");
@@ -48,7 +48,10 @@ public class GameScreen  extends AbstractScreen {
 
     @Override
     public void render(float delta) {
+        player.update(delta);
         camara.update(player.getX()+0.5f ,player.getY()+0.5f);
+
+        control.update(delta);
 
         batch.begin();
 
@@ -68,7 +71,7 @@ public class GameScreen  extends AbstractScreen {
             }
         }
 
-        batch.draw(playerStandingSouth, worldStartX+player.getX()* Settings.SCALED_TILE_SIZE, worldStartY+player.getY()*Settings.SCALED_TILE_SIZE, Settings.SCALED_TILE_SIZE
+        batch.draw(playerStandingSouth, worldStartX+player.getWorldX()* Settings.SCALED_TILE_SIZE, worldStartY+player.getWorldY()*Settings.SCALED_TILE_SIZE, Settings.SCALED_TILE_SIZE
                 , Settings.SCALED_TILE_SIZE*1.5f);//Ver dimensiones de sprite...
         batch.end();
     }

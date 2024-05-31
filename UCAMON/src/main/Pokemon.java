@@ -7,11 +7,11 @@ import com.badlogic.gdx.graphics.GL20;
 
 public class Pokemon extends Game {
 
-    private GameScreen screen;
+    private GameScreen screen1;
     public void create() {
-        screen = new GameScreen(this);
+        screen1 = new GameScreen(this);
 
-        this.setScreen(screen);
+        this.setScreen(screen1);
     }
     public void render() {
         Gdx.gl.glClearColor(0,0,0,1);
