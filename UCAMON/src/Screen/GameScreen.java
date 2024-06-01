@@ -4,10 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import controller.PlayerController;
-import entity.Camara;
-import entity.Entity;
-import entity.TERRAIN;
-import entity.TileMap;
+import entity.*;
 import main.Pokemon;
 import main.Settings;
 
@@ -33,8 +30,8 @@ public class GameScreen  extends AbstractScreen {
         BrownGrass2 = new Texture("resources/Tiles/brown_path.png");
         BrownGrass3 = new Texture("resources/Tiles/brown_path_grass_east.png");
         batch = new SpriteBatch();
-        map = new TileMap(20,12);
-        player = new Entity(map,0,0);
+        map = new TileMap(20,12, Grass1, BrownGrass2);
+        player = new Entity(map,10,6);
         camara = new Camara();
 
         control = new PlayerController(player);
@@ -60,13 +57,8 @@ public class GameScreen  extends AbstractScreen {
 
         for(int x = 0; x < map.getWidth(); x++){
             for(int y = 0; y <map.getHeight();y++) {
-                Texture render;
-
-                if (map.getTile(x, y).getTerrain() == TERRAIN.GRASS_1) {
-                    render = Grass1;
-                }else {
-                    render = Grass1;
-                }
+                TilePrueba tile = map.getTile(x, y);
+                Texture render = tile.getTexture();
                 batch.draw(render,worldStartX+x*Settings.SCALED_TILE_SIZE,worldStartY+y*Settings.SCALED_TILE_SIZE,Settings.SCALED_TILE_SIZE,Settings.SCALED_TILE_SIZE);
             }
         }

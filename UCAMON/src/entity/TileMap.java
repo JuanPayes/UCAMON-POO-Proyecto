@@ -1,20 +1,28 @@
 package entity;
 
+import com.badlogic.gdx.graphics.Texture;
+
 public class TileMap {
     private int width, height;
-    private Tile[][] tiles;//Tiles Matrix
-    public TileMap(int width, int height){
+    private TilePrueba[][] tiles;//Tiles Matrix
+
+    public TileMap(int width, int height, Texture grassTexture, Texture brownTexture){
         this.width = width;
         this.height =  height;
-        tiles = new Tile[width][height];
+        tiles = new TilePrueba[width][height];
+
         for(int i = 0; i < width;i++){
             for(int j = 0; j< height;j++){
-                tiles[i][j] = new Tile();
+                if (i == width / 2 && j == height / 2){
+                    tiles[i][j] = new TilePrueba(brownTexture, TERRAIN.BROWN_GRASS);
+                }else{
+                    tiles[i][j] = new TilePrueba(grassTexture, TERRAIN.GRASS_1);
+                }
             }
         }
     }
 
-    public Tile getTile(int x, int y){
+    public TilePrueba getTile(int x, int y){
         return  tiles[x][y];
     }
 
@@ -22,15 +30,9 @@ public class TileMap {
         return width;
     }
 
-    public void setWidth(int width) {
-        this.width = width;
-    }
 
     public int getHeight() {
         return height;
     }
 
-    public void setHeight(int height) {
-        this.height = height;
-    }
 }
