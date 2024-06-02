@@ -2,43 +2,74 @@ package controller;
 
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
+import entity.DIRECTION;
 import entity.Entity;
 import com.badlogic.gdx.utils.Array;
 
 public class PlayerController extends InputAdapter {
     private Entity player;
-    private Array<Integer> keyPressed;
+    private boolean up, down, left, right;
+
+
     public PlayerController(Entity pl){
         this.player = pl;
-        this.keyPressed = new Array<>();
+
     }
+
+
     @Override
     public boolean keyDown(int keycode){
-        if (!keyPressed.contains(keycode, true)){
-            keyPressed.add(keycode);
+        if (keycode == Input.Keys.W){
+            up = true;
         }
-        return true;
+        if (keycode == Input.Keys.A){
+            left = true;
+        }
+        if (keycode == Input.Keys.S){
+            down = true;
+        }
+        if (keycode == Input.Keys.D){
+            right = true;
+        }
+        return false;
     }
 
     public boolean keyUp(int keycode){
-        keyPressed.removeValue(keycode, true);
-        return true;
+        if (keycode == Input.Keys.W){
+            up = false;
+        }
+        if (keycode == Input.Keys.A){
+            left = false;
+        }
+        if (keycode == Input.Keys.S){
+            down = false;
+        }
+        if (keycode == Input.Keys.D){
+            right = false;
+        }
+
+        return false;
     }
 
     public void update(float delta){
-        for(int keycode : keyPressed){
-            if (keycode == Input.Keys.W){
-               player.move(0,1);
-            }
-            if (keycode == Input.Keys.S){
-                player.move(0,-1);
-            }
-            if (keycode == Input.Keys.D){
-                player.move(1,0);
-            }
-            if (keycode == Input.Keys.A){
-                player.move(-1,0);
-            }
+
+        if (up) {
+            player.move(DIRECTION.NORTH);
+            return;
+        }
+        if (down) {
+            player.move(DIRECTION.SOUTH);
+            return;
+        }
+        if (left) {
+            player.move(DIRECTION.WEST);
+            return;
+        }
+        if (right) {
+            player.move(DIRECTION.EAST);
+            return;
         }
     }
 }
+
+

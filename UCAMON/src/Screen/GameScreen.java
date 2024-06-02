@@ -1,8 +1,13 @@
 package Screen;
 
+import Util.AnimationSet;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import controller.PlayerController;
 import entity.*;
 import main.Pokemon;
@@ -20,18 +25,35 @@ public class GameScreen  extends AbstractScreen {
     private Texture BrownGrass2;
     private Texture BrownGrass3;
     private TileMap map;
+
     public GameScreen(Pokemon app) {
         super(app);
         this.control = new PlayerController(player);
 
-        playerStandingSouth = new Texture("resources/SpriteTest.png");
+        playerStandingSouth = new Texture("resources/unpacked/RedStanding_South.png");
+
         Grass1 = new Texture("resources/Tiles/grass.png");
         BrownGrass1 = new Texture("resources/Tiles/brown_path_grass_west.png");
         BrownGrass2 = new Texture("resources/Tiles/brown_path.png");
         BrownGrass3 = new Texture("resources/Tiles/brown_path_grass_east.png");
         batch = new SpriteBatch();
+
+        TextureAtlas atlas = app.getAssetManager().get("resources/packed/textures.atlas", TextureAtlas.class);
+
+        AnimationSet animations = new AnimationSet(
+                new Animation(0.3f/2f,atlas.findRegions("RedWalking_North"), PlayMode.LOOP_PINGPONG),
+                new Animation(0.3f/2f,atlas.findRegions("RedWalking_South"), PlayMode.LOOP_PINGPONG),
+                new Animation(0.3f/2f,atlas.findRegions("RedWalking_East"), PlayMode.LOOP_PINGPONG),
+                new Animation(0.3f/2f,atlas.findRegions("RedWalking_West"), PlayMode.LOOP_PINGPONG),
+                atlas.findRegion("RedStanding_North"),
+                atlas.findRegion("RedStanding_South"),
+                atlas.findRegion("RedStanding_East"),
+                atlas.findRegion("RedStanding_West")
+        );
+
+
         map = new TileMap(20,12, Grass1, BrownGrass2);
-        player = new Entity(map,10,6);
+        player = new Entity(map,0,0, animations);
         camara = new Camara();
 
         control = new PlayerController(player);
@@ -45,10 +67,13 @@ public class GameScreen  extends AbstractScreen {
 
     @Override
     public void render(float delta) {
-        player.update(delta);
-        camara.update(player.getX()+0.5f ,player.getY()+0.5f);
-
         control.update(delta);
+
+        player.update(delta);
+        camara.update(player.getWorldX()+0.5f ,player.getWorldY()+0.5f);
+
+        Gdx.gl.glClearColor(0, 0, 0, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         batch.begin();
 
@@ -63,8 +88,11 @@ public class GameScreen  extends AbstractScreen {
             }
         }
 
-        batch.draw(playerStandingSouth, worldStartX+player.getWorldX()* Settings.SCALED_TILE_SIZE, worldStartY+player.getWorldY()*Settings.SCALED_TILE_SIZE, Settings.SCALED_TILE_SIZE
-                , Settings.SCALED_TILE_SIZE*1.5f);//Ver dimensiones de sprite...
+        batch.draw(player.getSprite(),
+                worldStartX+player.getWorldX()*Settings.SCALED_TILE_SIZE,
+                worldStartY+player.getWorldY()*Settings.SCALED_TILE_SIZE,
+                Settings.SCALED_TILE_SIZE
+                ,Settings.SCALED_TILE_SIZE*1.5f);
         batch.end();
     }
 
