@@ -1,24 +1,33 @@
 package entity;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 public class TileMap {
     private int width, height;
     private TilePrueba[][] tiles;//Tiles Matrix
 
-    public TileMap(int width, int height, Texture grassTexture, Texture brownTexture){
+    public TileMap(int width, int height, Texture defaultTexture){
         this.width = width;
         this.height =  height;
         tiles = new TilePrueba[width][height];
 
-        for(int i = 0; i < width;i++){
-            for(int j = 0; j< height;j++){
-                if (i == width / 2 && j == height / 2){
-                    tiles[i][j] = new TilePrueba(brownTexture, TERRAIN.BROWN_GRASS);
-                }else{
-                    tiles[i][j] = new TilePrueba(grassTexture, TERRAIN.GRASS_1);
-                }
+        TextureRegion defaultTextureRegion = new TextureRegion(defaultTexture);
+
+        for(int x = 0; x < width; x++){
+            for(int y = 0; y < height; y++){
+                tiles[x][y] = new TilePrueba(defaultTextureRegion);
             }
+        }
+    }
+
+    public void setTile(int x, int y, TextureRegion textureRegion){
+        tiles[x][y] = new TilePrueba(textureRegion);
+    }
+
+    public void setTile(int x, int y, Texture texture){
+        if (x >= 0 && x < width && y >= 0 && y < height){
+            tiles[x][y] = new TilePrueba(new TextureRegion(texture));
         }
     }
 
@@ -30,9 +39,6 @@ public class TileMap {
         return width;
     }
 
-
-    public int getHeight() {
-        return height;
-    }
+    public int getHeight() {return height;}
 
 }

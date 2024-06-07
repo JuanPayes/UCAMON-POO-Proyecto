@@ -25,6 +25,7 @@ public class Entity {
     private ACTOR_STATE state;
 
     private AnimationSet animations;
+    private TextureRegion staticTexture;
 
     public enum ACTOR_STATE {
         WALKING,
@@ -42,6 +43,18 @@ public class Entity {
         map.getTile(x,y).setEntity(this);
         this.state = ACTOR_STATE.STANDING;
         this.facing = DIRECTION.SOUTH;
+    }
+
+    public Entity(TileMap map,int x, int y, TextureRegion staticTexture) {
+        this.map = map;
+        this.x = x;
+        this.y = y;
+        this.worldX = x;
+        this.worldY = y;
+        this.staticTexture = staticTexture;
+        this.state = ACTOR_STATE.STANDING;
+        this.facing = DIRECTION.SOUTH;
+        map.getTile(x,y).setEntity(this);
     }
 
     public boolean move(DIRECTION dir){
@@ -107,13 +120,17 @@ public class Entity {
         moveRequestThisFrame = false;
     }
 
-    public TextureRegion getSprite(){
-        if (state == ACTOR_STATE.WALKING) {
-            return animations.getWalkingAnimation(facing).getKeyFrame(walkTimer, true);
-        } else if (state == ACTOR_STATE.STANDING) {
-            return animations.getStandingAnimation(facing);
+    public TextureRegion getSprite() {
+        if (animations != null) {
+            if (state == ACTOR_STATE.WALKING) {
+                return animations.getWalkingAnimation(facing).getKeyFrame(walkTimer, true);
+            } else if (state == ACTOR_STATE.STANDING) {
+                return animations.getStandingAnimation(facing);
+            }
+            return animations.getStandingAnimation(DIRECTION.SOUTH);
+        } else {
+            return staticTexture;
         }
-        return animations.getStandingAnimation(DIRECTION.SOUTH);
     }
 
     public int getX() {

@@ -1,29 +1,41 @@
 package entity;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 public class TilePrueba {
     private Entity entity;
-    private Texture texture;
-    private TERRAIN terrain;
+    private TextureRegion textureRegion;
 
-    public TilePrueba(Texture texture, TERRAIN terrain){
-        this.texture = texture;
-        this.terrain = terrain;
+    public TilePrueba(Texture texture) {
+        this.textureRegion = new TextureRegion(texture);
+    }
+
+    public TilePrueba(TextureRegion textureRegion) {
+        this.textureRegion = textureRegion;
+    }
+
+    public TextureRegion getTextureRegion() {
+        return textureRegion;
     }
 
     public Texture getTexture() {
-        return texture;
+        return textureRegion.getTexture();
     }
 
-    public TERRAIN getTerrain(){
-        return terrain;
-    }
     public Entity getEntity() {
         return entity;
     }
 
     public void setEntity(Entity entity) {
         this.entity = entity;
+    }
+
+    public void setTexture(Texture texture) {
+        this.textureRegion = new TextureRegion(texture);
+    }
+
+    public void setTextureRegion(TextureRegion textureRegion) {
+        this.textureRegion = textureRegion;
     }
 }
