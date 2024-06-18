@@ -81,7 +81,7 @@ public class GameScreen  extends AbstractScreen {
         treeEntities = new ArrayList<>();
 
         for(int y = 0; y < map.getHeight()-2; y++){
-            addTree(7, y);
+            addTree(6, y);
             addTree(13, y);
         }
         }
@@ -102,8 +102,8 @@ public class GameScreen  extends AbstractScreen {
                     map.setTile(x + i, y, trees.get(i * 2));
                     treeEntities.add(new Entity(map, x, y + i, trees.get(i * 2)));
 
-                    map.setTile(x + i, y, trees.get(i * 2 + 1));
-                    treeEntities.add(new Entity(map, x + i, y + i, trees.get(i * 2 + 1)));
+                    map.setTile(x + 1, y + i, trees.get(i * 2 + 1));
+                    treeEntities.add(new Entity(map, x + 1, y + i, trees.get(i * 2 + 1)));
                 }
             }
         }
