@@ -98,9 +98,9 @@ public class GameScreen  extends AbstractScreen {
             addTree(map, pos[0], pos[1]);
         }
 
-        addPokeStore(map, 3, 7);
+        addPokeStore(map, 4, 4);
 
-        addPokeCenter(map, 13,8);
+        addPokeCenter(map, 3,11);
     }
 
     private void addTree(TileMap map, int x, int y) {
