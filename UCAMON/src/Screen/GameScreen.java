@@ -25,7 +25,7 @@ public class GameScreen  extends AbstractScreen {
     private SpriteBatch batch;
 
     private List<TextureRegion> store;
-
+    private List<TextureRegion> center;
     private List<TextureRegion> trees;
     private List<Entity> entities;
 
@@ -50,6 +50,12 @@ public class GameScreen  extends AbstractScreen {
         store = new ArrayList<>();
         for (int i = 0; i < 16 ;i++){
             store.add(new TextureRegion(new Texture("resources/Tiles/Store/pokeStore_"+i+".png")));
+
+        }
+
+        center = new ArrayList<>();
+        for (int i = 0; i < 25 ;i++){
+            center.add(new TextureRegion(new Texture("resources/Tiles/Center/pokeCenter_"+i+".png")));
         }
 
         trees = new ArrayList<>();
@@ -73,7 +79,7 @@ public class GameScreen  extends AbstractScreen {
 
         map = new TileMap(20, 12, Grass1);
         int[][] treePositions = {{0, 2}, {0, 6}, {0, 10}, {18, 2}, {18, 6}, {18, 10}};
-        player = new Entity(map, 10, 6, animations);
+        player = new Entity(map, 10, 1, animations);
         camara = new Camara();
 
         control = new PlayerController(player);
@@ -85,11 +91,16 @@ public class GameScreen  extends AbstractScreen {
             map.setTile(8, y, new TextureRegion(BrownGrass1));
             map.setTile(12, y, new TextureRegion(BrownGrass3));
         }
+
         entities = new ArrayList<>();
+
         for (int[] pos : treePositions) {
             addTree(map, pos[0], pos[1]);
         }
+
         addPokeStore(map, 3, 7);
+
+        addPokeCenter(map, 13,8);
     }
 
     private void addTree(TileMap map, int x, int y) {
@@ -105,23 +116,44 @@ public class GameScreen  extends AbstractScreen {
             entities.add(new Entity(map, treeCoords[i][0], treeCoords[i][1], trees.get(i)));
         }
     }
+
     public void addPokeStore(TileMap map, int startX, int startY) {
-        int[][] buildingLayout = {
+        int[][] storeLayout = {
                 {0, 1, 2, 3},
                 {4, 5, 6, 7},
                 {8, 9, 10, 11},
                 {12, 13, 14, 15}
         };
 
-        for (int y = 0; y < buildingLayout.length; y++) {
-            for (int x = 0; x < buildingLayout[y].length; x++) {
-                int tileIndex = buildingLayout[y][x];
+        for (int y = 0; y < storeLayout.length; y++) {
+            for (int x = 0; x < storeLayout[y].length; x++) {
+                int tileIndex = storeLayout[y][x];
                 if (tileIndex >= 0) {
                     addTile(map, startX + x, startY - y, store.get(tileIndex));
                 }
             }
         }
     }
+
+    public void addPokeCenter(TileMap map, int startX, int startY) {
+        int[][] centerLayout = {
+                {0, 1, 2, 3, 4},
+                {5, 6, 7, 8, 9},
+                {10, 11, 12, 13, 14},
+                {15, 16, 17, 18, 19},
+                {20, 21, 22, 23, 24}
+        };
+
+        for (int y = 0; y < centerLayout.length; y++) {
+            for (int x = 0; x < centerLayout[y].length; x++) {
+                int tileIndex = centerLayout[y][x];
+                if (tileIndex >= 0) {
+                    addTile(map, startX + x, startY - y, center.get(tileIndex));
+                }
+            }
+        }
+    }
+
     private void addTile(TileMap map, int x, int y, TextureRegion tile) {
         Entity buildingTile = new Entity(map, x, y, tile);
         entities.add(buildingTile);

@@ -1,117 +1,229 @@
 
 textures.png
-size: 512,64
+size: 1024,64
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
-RedStanding_East
+NPC1_Standing_South
   rotate: false
   xy: 2, 2
+  size: 16, 24
+  orig: 16, 24
+  offset: 0, 0
+  index: 0
+NPC_Standing_East
+  rotate: false
+  xy: 2, 28
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+NPC_Standing_East
+  rotate: false
+  xy: 2, 28
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 1
+NPC_Standing_East
+  rotate: false
+  xy: 36, 28
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 0
+NPC_Standing_East
+  rotate: false
+  xy: 70, 28
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 2
+NPC_Standing_North
+  rotate: false
+  xy: 104, 28
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+NPC_Standing_North
+  rotate: false
+  xy: 104, 28
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 1
+NPC_Standing_North
+  rotate: false
+  xy: 138, 28
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 0
+NPC_Standing_North
+  rotate: false
+  xy: 172, 28
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 2
+NPC_Standing_South
+  rotate: false
+  xy: 206, 28
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+NPC_Standing_South
+  rotate: false
+  xy: 206, 28
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 1
+NPC_Standing_South
+  rotate: false
+  xy: 240, 28
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 2
+NPC_Standing_West
+  rotate: false
+  xy: 274, 28
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+NPC_Standing_West 
+  rotate: false
+  xy: 274, 28
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 1
+NPC_Standing_West
+  rotate: false
+  xy: 308, 28
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 0
+NPC_Standing_West
+  rotate: false
+  xy: 342, 28
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 2
+RedStanding_East
+  rotate: false
+  xy: 376, 28
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 RedWalking_East
   rotate: false
-  xy: 2, 2
+  xy: 376, 28
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 0
 RedStanding_North
   rotate: false
-  xy: 36, 2
+  xy: 410, 28
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 RedWalking_North
   rotate: false
-  xy: 36, 2
+  xy: 410, 28
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 0
 RedStanding_South
   rotate: false
-  xy: 70, 2
+  xy: 444, 28
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 RedWalking_South
   rotate: false
-  xy: 70, 2
+  xy: 444, 28
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 0
 RedStanding_West
   rotate: false
-  xy: 104, 2
+  xy: 478, 28
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 RedWalking_West
   rotate: false
-  xy: 104, 2
+  xy: 478, 28
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 0
 RedWalking_East
   rotate: false
-  xy: 138, 2
+  xy: 512, 28
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 1
 RedWalking_East
   rotate: false
-  xy: 172, 2
+  xy: 546, 28
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 2
 RedWalking_North
   rotate: false
-  xy: 206, 2
+  xy: 580, 28
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 1
 RedWalking_North
   rotate: false
-  xy: 240, 2
+  xy: 614, 28
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 2
 RedWalking_South
   rotate: false
-  xy: 274, 2
+  xy: 648, 28
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 1
 RedWalking_South
   rotate: false
-  xy: 308, 2
+  xy: 682, 28
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 2
 RedWalking_West
   rotate: false
-  xy: 342, 2
+  xy: 716, 28
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 1
 RedWalking_West
   rotate: false
-  xy: 376, 2
+  xy: 750, 28
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
