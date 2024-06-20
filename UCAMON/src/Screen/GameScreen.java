@@ -66,12 +66,11 @@ public class GameScreen  extends AbstractScreen {
 
 
         map = new TileMap(20, 12, Grass1);
+        int[][] treePositions = {{0, 2}, {0, 6}, {0, 10}, {18, 2}, {18, 6}, {18, 10}};
         player = new Entity(map, 10, 6, animations);
         camara = new Camara();
 
         control = new PlayerController(player);
-
-        generateTreesAroundScreen(map);
 
         for (int y = 0; y < map.getHeight(); y++) {
             map.setTile(10, y, BrownGrass2);
@@ -81,32 +80,24 @@ public class GameScreen  extends AbstractScreen {
             map.setTile(12, y, new TextureRegion(BrownGrass3));
         }
         treeEntities = new ArrayList<>();
-    }
-
-    private void addTree(TileMap map, int x, int y, TextureRegion texture) {
-        treeEntities.add(new Entity(map, x, y, texture));
-    }
-
-    private void generateTreesAroundScreen(TileMap map) {
-        treeEntities.clear();
-
-        float screenWidth = Gdx.graphics.getWidth() / Settings.SCALED_TILE_SIZE;
-        float screenHeight = Gdx.graphics.getHeight() / Settings.SCALED_TILE_SIZE;
-
-        for (int y = 0; y < screenHeight; y += 3) {
-
-            addTree(map, 0, y, trees.get(0));
-            addTree(map, 0, y + 1, trees.get(2));
-            addTree(map, 0, y + 2, trees.get(4));
-
-
-            addTree(map, (int)screenWidth - 2, y, trees.get(1));
-            addTree(map, (int)screenWidth - 2, y + 1, trees.get(3));
-            addTree(map, (int)screenWidth - 2, y + 2, trees.get(5));
+        for (int[] pos : treePositions) {
+            addTree(map, pos[0], pos[1]);
         }
     }
 
-
+    private void addTree(TileMap map, int x, int y) {
+        int[][] treeCoords = {
+                {x, y},
+                {x + 1, y},
+                {x, y - 1},
+                {x + 1, y - 1},
+                {x, y - 2},
+                {x + 1, y - 2}
+        };
+        for (int i = 0; i < 6; i++) {
+            treeEntities.add(new Entity(map, treeCoords[i][0], treeCoords[i][1], trees.get(i)));
+        }
+    }
 
     @Override
     public void show() {
@@ -115,13 +106,11 @@ public class GameScreen  extends AbstractScreen {
 
     @Override
     public void render(float delta) {
-        batch.begin();
         updateGameLogic(delta);
         clearScreen();
         drawGameWorld();
         drawEntities();
         drawPlayer();
-        batch.end();
     }
 
     private void updateGameLogic(float delta) {
@@ -136,6 +125,7 @@ public class GameScreen  extends AbstractScreen {
     }
 
     private void drawGameWorld() {
+        batch.begin();
         float worldStartX = Gdx.graphics.getWidth() / 2 - camara.getCamaraX();
         float worldStartY = Gdx.graphics.getHeight() / 2 - camara.getCamaraY();
         for (int x = 0; x < map.getWidth(); x++) {
@@ -149,15 +139,25 @@ public class GameScreen  extends AbstractScreen {
                         Settings.SCALED_TILE_SIZE);
             }
         }
+        batch.end();
     }
 
     private void drawEntities() {
-        float worldStartX = Gdx.graphics.getWidth() / 2 - camara.getCamaraX();
-        float worldStartY = Gdx.graphics.getHeight() / 2 - camara.getCamaraY();
-        drawTrees(batch, worldStartX, worldStartY);
+        batch.begin();
+        for (Entity tree : treeEntities) {
+            float worldStartX = Gdx.graphics.getWidth() / 2 - camara.getCamaraX();
+            float worldStartY = Gdx.graphics.getHeight() / 2 - camara.getCamaraY();
+            batch.draw(tree.getSprite(),
+                    worldStartX + tree.getWorldX() * Settings.SCALED_TILE_SIZE,
+                    worldStartY + tree.getWorldY() * Settings.SCALED_TILE_SIZE,
+                    Settings.SCALED_TILE_SIZE,
+                    Settings.SCALED_TILE_SIZE * 1.5f);
+        }
+        batch.end();
     }
 
     private void drawPlayer() {
+        batch.begin();
         float worldStartX = Gdx.graphics.getWidth() / 2 - camara.getCamaraX();
         float worldStartY = Gdx.graphics.getHeight() / 2 - camara.getCamaraY();
         batch.draw(player.getSprite(),
@@ -165,21 +165,13 @@ public class GameScreen  extends AbstractScreen {
                 worldStartY + player.getWorldY() * Settings.SCALED_TILE_SIZE,
                 Settings.SCALED_TILE_SIZE,
                 Settings.SCALED_TILE_SIZE * 1.5f);
+        batch.end();
     }
 
     private void updateCamera() {
         float playerWorldX = player.getWorldX() * Settings.SCALED_TILE_SIZE + Settings.SCALED_TILE_SIZE / 2;
         float playerWorldY = player.getWorldY() * Settings.SCALED_TILE_SIZE + Settings.SCALED_TILE_SIZE / 2;
         camara.update(playerWorldX, playerWorldY);
-    }
-
-    public void drawTrees(SpriteBatch batch, float worldStartX, float worldStartY) {
-        for (Entity tree : treeEntities) {
-            float x = worldStartX + tree.getWorldX() * Settings.SCALED_TILE_SIZE;
-            float y = worldStartY + tree.getWorldY() * Settings.SCALED_TILE_SIZE;
-
-            batch.draw(tree.getSprite(), x, y, Settings.SCALED_TILE_SIZE, Settings.SCALED_TILE_SIZE);
-        }
     }
 
 
