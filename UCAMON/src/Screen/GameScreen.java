@@ -24,15 +24,16 @@ public class GameScreen  extends AbstractScreen {
     private Texture playerStandingSouth;
     private SpriteBatch batch;
 
+    private List<TextureRegion> store;
+
     private List<TextureRegion> trees;
-    private List<Entity> treeEntities;
+    private List<Entity> entities;
 
     private TextureRegion[] treeTexture;
 
     private Texture Grass1, BrownGrass1,BrownGrass2, BrownGrass3;
 
     private TileMap map;
-
 
     public GameScreen(Pokemon app) {
         super(app);
@@ -45,6 +46,11 @@ public class GameScreen  extends AbstractScreen {
         BrownGrass2 = new Texture("resources/Tiles/brown_path.png");
         BrownGrass3 = new Texture("resources/Tiles/brown_path_grass_east.png");
         batch = new SpriteBatch();
+
+        store = new ArrayList<>();
+        for (int i = 0; i < 16 ;i++){
+            store.add(new TextureRegion(new Texture("resources/Tiles/Store/pokeStore_"+i+".png")));
+        }
 
         trees = new ArrayList<>();
         for (int i = 0; i < 6; i++) {
@@ -79,10 +85,11 @@ public class GameScreen  extends AbstractScreen {
             map.setTile(8, y, new TextureRegion(BrownGrass1));
             map.setTile(12, y, new TextureRegion(BrownGrass3));
         }
-        treeEntities = new ArrayList<>();
+        entities = new ArrayList<>();
         for (int[] pos : treePositions) {
             addTree(map, pos[0], pos[1]);
         }
+        addPokeStore(map, 3, 7);
     }
 
     private void addTree(TileMap map, int x, int y) {
@@ -95,8 +102,29 @@ public class GameScreen  extends AbstractScreen {
                 {x + 1, y - 2}
         };
         for (int i = 0; i < 6; i++) {
-            treeEntities.add(new Entity(map, treeCoords[i][0], treeCoords[i][1], trees.get(i)));
+            entities.add(new Entity(map, treeCoords[i][0], treeCoords[i][1], trees.get(i)));
         }
+    }
+    public void addPokeStore(TileMap map, int startX, int startY) {
+        int[][] buildingLayout = {
+                {0, 1, 2, 3},
+                {4, 5, 6, 7},
+                {8, 9, 10, 11},
+                {12, 13, 14, 15}
+        };
+
+        for (int y = 0; y < buildingLayout.length; y++) {
+            for (int x = 0; x < buildingLayout[y].length; x++) {
+                int tileIndex = buildingLayout[y][x];
+                if (tileIndex >= 0) {
+                    addTile(map, startX + x, startY - y, store.get(tileIndex));
+                }
+            }
+        }
+    }
+    private void addTile(TileMap map, int x, int y, TextureRegion tile) {
+        Entity buildingTile = new Entity(map, x, y, tile);
+        entities.add(buildingTile);
     }
 
     @Override
@@ -144,7 +172,7 @@ public class GameScreen  extends AbstractScreen {
 
     private void drawEntities() {
         batch.begin();
-        for (Entity tree : treeEntities) {
+        for (Entity tree : entities) {
             float worldStartX = Gdx.graphics.getWidth() / 2 - camara.getCamaraX();
             float worldStartY = Gdx.graphics.getHeight() / 2 - camara.getCamaraY();
             batch.draw(tree.getSprite(),
