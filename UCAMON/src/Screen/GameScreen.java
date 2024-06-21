@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.audio.Music;
 import controller.PlayerController;
 import entity.*;
 import main.Pokemon;
@@ -28,10 +29,11 @@ public class GameScreen  extends AbstractScreen {
     private List<TextureRegion> center;
     private List<TextureRegion> trees;
     private List<Entity> entities;
+    private Music adventureTrack;
 
     private TextureRegion[] treeTexture;
 
-    private Texture Grass1, BrownGrass1,BrownGrass2, BrownGrass3;
+    private Texture Grass1, BrownGrass1,BrownGrass2, BrownGrass3, HighGrass;
 
     private TileMap map;
 
@@ -39,12 +41,17 @@ public class GameScreen  extends AbstractScreen {
         super(app);
         this.control = new PlayerController(player);
 
+        adventureTrack = Gdx.audio.newMusic(Gdx.files.internal("resources/Music/adventure_Track.mp3"));
+        adventureTrack.setLooping(true);
+        adventureTrack.play();
+
         playerStandingSouth = new Texture("resources/unpacked/RedStanding_South.png");
 
         Grass1 = new Texture("resources/Tiles/grass.png");
         BrownGrass1 = new Texture("resources/Tiles/brown_path_grass_west.png");
         BrownGrass2 = new Texture("resources/Tiles/brown_path.png");
         BrownGrass3 = new Texture("resources/Tiles/brown_path_grass_east.png");
+        HighGrass = new Texture("resources/Tiles/high_Grass.png");
         batch = new SpriteBatch();
 
         store = new ArrayList<>();
@@ -92,15 +99,23 @@ public class GameScreen  extends AbstractScreen {
             map.setTile(12, y, new TextureRegion(BrownGrass3));
         }
 
+        for (int y = 0; y < map.getHeight(); y++) {
+            if (y >= 1 && y <= 10) {
+                for (int x = 13; x < 18; x++) {
+                    map.setTile(x, y, new TextureRegion(HighGrass));
+                }
+            }
+        }
+
         entities = new ArrayList<>();
 
         for (int[] pos : treePositions) {
             addTree(map, pos[0], pos[1]);
         }
 
-        addPokeStore(map, 4, 4);
+        addPokeStore(map, 2, 5);
 
-        addPokeCenter(map, 3,11);
+        addPokeCenter(map, 2,11);
     }
 
     private void addTree(TileMap map, int x, int y) {
