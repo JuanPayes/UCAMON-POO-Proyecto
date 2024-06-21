@@ -43,6 +43,7 @@ public class GameScreen  extends AbstractScreen {
 
         adventureTrack = Gdx.audio.newMusic(Gdx.files.internal("resources/Music/adventure_Track.mp3"));
         adventureTrack.setLooping(true);
+        adventureTrack.setVolume(0.1f);
         adventureTrack.play();
 
         playerStandingSouth = new Texture("resources/unpacked/RedStanding_South.png");
