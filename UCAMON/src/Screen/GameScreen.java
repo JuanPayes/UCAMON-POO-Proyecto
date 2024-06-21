@@ -85,8 +85,8 @@ public class GameScreen  extends AbstractScreen {
         );
 
 
-        map = new TileMap(20, 12, Grass1);
-        int[][] treePositions = {{0, 2}, {0, 6}, {0, 10}, {18, 2}, {18, 6}, {18, 10}};
+        map = new TileMap(20, 36, Grass1);
+        int[][] treePositions = {{0, 10}, {0, 14}, {0, 18}, {18, 10}, {18, 14}, {18, 18}};
         player = new Entity(map, 10, 1, animations);
         camara = new Camara();
 
@@ -101,7 +101,7 @@ public class GameScreen  extends AbstractScreen {
         }
 
         for (int y = 0; y < map.getHeight(); y++) {
-            if (y >= 1 && y <= 10) {
+            if (y >= 10 && y <= 19) {
                 for (int x = 13; x < 18; x++) {
                     map.setTile(x, y, new TextureRegion(HighGrass));
                 }
@@ -114,9 +114,9 @@ public class GameScreen  extends AbstractScreen {
             addTree(map, pos[0], pos[1]);
         }
 
-        addPokeStore(map, 2, 5);
+        addPokeStore(map, 2, 15);
 
-        addPokeCenter(map, 2,11);
+        addPokeCenter(map, 2,21);
     }
 
     private void addTree(TileMap map, int x, int y) {
