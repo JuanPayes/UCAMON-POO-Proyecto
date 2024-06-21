@@ -33,7 +33,7 @@ public class GameScreen  extends AbstractScreen {
 
     private TextureRegion[] treeTexture;
 
-    private Texture Grass1, BrownGrass1,BrownGrass2, BrownGrass3, HighGrass;
+    private Texture Grass1, brownGrass1,brownGrass2, brownGrass3, HighGrass, road, northRoad, southRoad, brownGrass4, brownGrass5, brownGrass6, brownGrass7;
 
     private TileMap map;
 
@@ -49,16 +49,20 @@ public class GameScreen  extends AbstractScreen {
         playerStandingSouth = new Texture("resources/unpacked/RedStanding_South.png");
 
         Grass1 = new Texture("resources/Tiles/grass.png");
-        BrownGrass1 = new Texture("resources/Tiles/brown_path_grass_west.png");
-        BrownGrass2 = new Texture("resources/Tiles/brown_path.png");
-        BrownGrass3 = new Texture("resources/Tiles/brown_path_grass_east.png");
+        brownGrass1 = new Texture("resources/Tiles/Path/brownPath_west.png"); //west
+        brownGrass2 = new Texture("resources/Tiles/Path/brownPath_center.png"); //center
+        brownGrass3 = new Texture("resources/Tiles/Path/brownPath_east.png"); //east
+        brownGrass4 = new Texture("resources/Tiles/Path/brownPath_north.png"); //north
+        brownGrass5 = new Texture("resources/Tiles/Path/brownPath_south.png"); //south
         HighGrass = new Texture("resources/Tiles/high_Grass.png");
+        road = new Texture("resources/Tiles/Road/roadPath.png");
+        northRoad = new Texture("resources/Tiles/Road/roadPath_North.png");
+        southRoad = new Texture("resources/Tiles/Road/roadPath_South.png");
         batch = new SpriteBatch();
 
         store = new ArrayList<>();
         for (int i = 0; i < 16 ;i++){
             store.add(new TextureRegion(new Texture("resources/Tiles/Store/pokeStore_"+i+".png")));
-
         }
 
         center = new ArrayList<>();
@@ -86,23 +90,30 @@ public class GameScreen  extends AbstractScreen {
 
 
         map = new TileMap(20, 36, Grass1);
-        int[][] treePositions = {{0, 10}, {0, 14}, {0, 18}, {18, 10}, {18, 14}, {18, 18}};
+        int[][] treePositions = {{0, 10}, {0, 14}, {0, 18}, {18, 10}, {18, 14}, {18, 18},{18, 6},{0, 6},{0,22},{0,26},{18,22},{18,26}
+        };
+        int[][] highGrassRegions = {{10, 19, 13, 18}, {24, 27, 13, 18}, {24, 27, 2, 7}
+        };
         player = new Entity(map, 10, 1, animations);
         camara = new Camara();
 
         control = new PlayerController(player);
 
         for (int y = 0; y < map.getHeight(); y++) {
-            map.setTile(10, y, BrownGrass2);
-            map.setTile(11, y, BrownGrass2);
-            map.setTile(9, y, BrownGrass2);
-            map.setTile(8, y, new TextureRegion(BrownGrass1));
-            map.setTile(12, y, new TextureRegion(BrownGrass3));
+            map.setTile(10, y, brownGrass2);
+            map.setTile(11, y, brownGrass2);
+            map.setTile(9, y, brownGrass2);
+            map.setTile(8, y, new TextureRegion(brownGrass1));
+            map.setTile(12, y, new TextureRegion(brownGrass3));
         }
 
-        for (int y = 0; y < map.getHeight(); y++) {
-            if (y >= 10 && y <= 19) {
-                for (int x = 13; x < 18; x++) {
+        for (int[] region : highGrassRegions) {
+            int startY = region[0];
+            int endY = region[1];
+            int startX = region[2];
+            int endX = region[3];
+            for (int y = startY; y <= endY; y++) {
+                for (int x = startX; x < endX; x++) {
                     map.setTile(x, y, new TextureRegion(HighGrass));
                 }
             }
@@ -117,6 +128,8 @@ public class GameScreen  extends AbstractScreen {
         addPokeStore(map, 2, 15);
 
         addPokeCenter(map, 2,21);
+
+        addHorizontalRoad(map, 0, map.getWidth() - 1, 29);
     }
 
     private void addTree(TileMap map, int x, int y) {
@@ -167,6 +180,14 @@ public class GameScreen  extends AbstractScreen {
                     addTile(map, startX + x, startY - y, center.get(tileIndex));
                 }
             }
+        }
+    }
+
+    private void addHorizontalRoad(TileMap map, int startX, int endX, int y) {
+        for (int x = startX; x <= endX; x++) {
+            map.setTile(x, y, new TextureRegion(road));        // Camino central
+            map.setTile(x, y + 1, new TextureRegion(northRoad));  // Parte superior del camino
+            map.setTile(x, y - 1, new TextureRegion(southRoad));  // Parte inferior del camino
         }
     }
 
