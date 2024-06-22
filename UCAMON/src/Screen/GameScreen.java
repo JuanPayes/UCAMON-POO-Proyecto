@@ -29,6 +29,8 @@ public class GameScreen  extends AbstractScreen {
     private List<TextureRegion> center;
     private List<TextureRegion> trees;
     private List<Entity> entities;
+    private List<TextureRegion> librery;
+
     private Music adventureTrack;
 
     private TextureRegion[] treeTexture;
@@ -75,6 +77,12 @@ public class GameScreen  extends AbstractScreen {
             trees.add(new TextureRegion(new Texture("resources/Tiles/Tree/tree_" + i + ".png")));
         }
 
+        librery = new ArrayList<>();
+        for (int i = 0; i < 54; i++) {
+            librery.add(new TextureRegion(new Texture("resources/Tiles/UcaLib/librery_" + i + ".png")));
+        }
+
+
         TextureAtlas atlas = app.getAssetManager().get("resources/packed/textures.atlas", TextureAtlas.class);
 
         AnimationSet animations = new AnimationSet(
@@ -90,11 +98,11 @@ public class GameScreen  extends AbstractScreen {
 
 
         map = new TileMap(20, 36, Grass1);
-        int[][] treePositions = {{0, 10}, {0, 14}, {0, 18}, {18, 10}, {18, 14}, {18, 18},{18, 6},{0, 6},{0,22},{0,26},{18,22},{18,26},{18,33},{0,33}
+        int[][] treePositions = {{0, 10}, {0, 14}, {0, 18}, {18, 10}, {18, 14}, {18, 18},{18, 6},{0, 6},{0,22},{0,25},{18,22},{18,25},{18,33},{0,33}
         };
-        int[][] highGrassRegions = {{10, 19, 13, 18}, {24, 27, 13, 18}, {24, 27, 2, 7}
+        int[][] highGrassRegions = {{10, 19, 13, 18}, {22, 25, 13, 18}, {22, 25, 2, 7}
         };
-        player = new Entity(map, 10, 1, animations);
+        player = new Entity(map, 10, 20, animations);
         camara = new Camara();
 
         control = new PlayerController(player);
@@ -129,7 +137,9 @@ public class GameScreen  extends AbstractScreen {
 
         addPokeCenter(map, 2,21);
 
-        addHorizontalRoad(map, 0, map.getWidth() - 1, 29);
+        addHorizontalRoad(map, 0, map.getWidth() - 1, 28);
+
+        addUcaLib(map, 6, 35);
     }
 
     private void addTree(TileMap map, int x, int y) {
@@ -146,7 +156,7 @@ public class GameScreen  extends AbstractScreen {
         }
     }
 
-    public void addPokeStore(TileMap map, int startX, int startY) {
+    private void addPokeStore(TileMap map, int startX, int startY) {
         int[][] storeLayout = {
                 {0, 1, 2, 3},
                 {4, 5, 6, 7},
@@ -164,7 +174,7 @@ public class GameScreen  extends AbstractScreen {
         }
     }
 
-    public void addPokeCenter(TileMap map, int startX, int startY) {
+    private void addPokeCenter(TileMap map, int startX, int startY) {
         int[][] centerLayout = {
                 {0, 1, 2, 3, 4},
                 {5, 6, 7, 8, 9},
@@ -178,6 +188,25 @@ public class GameScreen  extends AbstractScreen {
                 int tileIndex = centerLayout[y][x];
                 if (tileIndex >= 0) {
                     addTile(map, startX + x, startY - y, center.get(tileIndex));
+                }
+            }
+        }
+    }
+
+    private void addUcaLib(TileMap map, int startX, int startY) {
+        int[][] ucaLayout = {
+                //{0, 1, 2, 3, 4, 5, 6, 7, 8},
+                {9, 10, 11, 12, 13, 14, 15, 16, 17},
+                {18, 19, 20, 21, 22, 23, 24, 25, 26},
+                {27, 28, 29, 30, 31, 32, 33, 34, 35},
+                {36, 37, 38, 39, 40, 41, 42, 43, 44},
+                {45, 46, 47, 48, 49, 50, 51, 52, 53},
+        };
+        for (int y = 0; y < ucaLayout.length; y++) {
+            for (int x = 0; x < ucaLayout[y].length; x++) {
+                int tileIndex = ucaLayout[y][x];
+                if (tileIndex >= 0) {
+                    addTile(map, startX + x, startY - y, librery.get(tileIndex));
                 }
             }
         }
