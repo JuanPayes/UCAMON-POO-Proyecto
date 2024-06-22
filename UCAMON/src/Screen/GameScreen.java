@@ -102,7 +102,7 @@ public class GameScreen  extends AbstractScreen {
         };
         int[][] highGrassRegions = {{10, 19, 13, 18}, {22, 25, 13, 18}, {22, 25, 2, 7}
         };
-        player = new Entity(map, 10, 20, animations);
+        player = new Entity(map, 10, 1, animations);
         camara = new Camara();
 
         control = new PlayerController(player);
