@@ -24,7 +24,7 @@ public class GameScreen  extends AbstractScreen {
     private Entity player;
     private Texture playerStandingSouth;
     private SpriteBatch batch;
-
+    private List<TextureRegion> pilar;
     private List<TextureRegion> store;
     private List<TextureRegion> center;
     private List<TextureRegion> trees;
@@ -35,8 +35,8 @@ public class GameScreen  extends AbstractScreen {
 
     private TextureRegion[] treeTexture;
 
-    private Texture Grass1, brownGrass1,brownGrass2, brownGrass3, HighGrass, road, northRoad, southRoad, brownGrass4, brownGrass5, brownGrass6, brownGrass7;
-
+    private Texture Grass1, brownGrass1,brownGrass2, brownGrass3, HighGrass, road, northRoad, southRoad, brownGrass4, brownGrass5;
+    private Texture pea1, pea2, pea3, pea4, pea5, pea6;
     private TileMap map;
 
     public GameScreen(Pokemon app) {
@@ -60,6 +60,13 @@ public class GameScreen  extends AbstractScreen {
         road = new Texture("resources/Tiles/Road/roadPath.png");
         northRoad = new Texture("resources/Tiles/Road/roadPath_North.png");
         southRoad = new Texture("resources/Tiles/Road/roadPath_South.png");
+        pea1 = new Texture("resources/Tiles/Pea/pea_center.png");
+        pea2 = new Texture("resources/Tiles/Pea/pea_east.png");
+        pea3 = new Texture("resources/Tiles/Pea/pea_north.png");
+        pea4 = new Texture("resources/Tiles/Pea/pea_west.png");
+        pea5 = new Texture("resources/Tiles/Pea/pea_north_east.png");
+        pea6 = new Texture("resources/Tiles/Pea/pea_north_west.png");
+
         batch = new SpriteBatch();
 
         store = new ArrayList<>();
@@ -82,6 +89,11 @@ public class GameScreen  extends AbstractScreen {
             librery.add(new TextureRegion(new Texture("resources/Tiles/UcaLib/librery_" + i + ".png")));
         }
 
+        pilar = new ArrayList<>();
+        for (int i = 0; i < 6; i++) {
+            pilar.add(new TextureRegion(new Texture("resources/Tiles/Pilar/pilar_"+i+".png")));
+        }
+
 
         TextureAtlas atlas = app.getAssetManager().get("resources/packed/textures.atlas", TextureAtlas.class);
 
@@ -98,9 +110,11 @@ public class GameScreen  extends AbstractScreen {
 
 
         map = new TileMap(20, 36, Grass1);
-        int[][] treePositions = {{0, 10}, {0, 14}, {0, 18}, {18, 10}, {18, 14}, {18, 18},{18, 6},{0, 6},{0,22},{0,25},{18,22},{18,25},{18,33},{0,33}
+        int[][] treePositions = {{0,2}, {18, 2},{0, 10}, {0, 14}, {0, 18}, {18, 10}, {18, 14}, {18, 18},{18, 6},{0, 6},{0,22},{0,25},{18,22},{18,25},{18,33},{0,33}
         };
         int[][] highGrassRegions = {{10, 19, 13, 18}, {22, 25, 13, 18}, {22, 25, 2, 7}
+        };
+        int[][] pilarPostion = {{5, 2},{14, 2}
         };
         player = new Entity(map, 10, 1, animations);
         camara = new Camara();
@@ -133,6 +147,10 @@ public class GameScreen  extends AbstractScreen {
             addTree(map, pos[0], pos[1]);
         }
 
+        for (int[] pos : pilarPostion) {
+            addPilar(map, pos[0], pos[1]);
+        }
+
         addPokeStore(map, 2, 15);
 
         addPokeCenter(map, 2,21);
@@ -140,6 +158,8 @@ public class GameScreen  extends AbstractScreen {
         addHorizontalRoad(map, 0, map.getWidth() - 1, 28);
 
         addUcaLib(map, 6, 35);
+
+        addEntrance(map, 6, 0);
     }
 
     private void addTree(TileMap map, int x, int y) {
@@ -153,6 +173,20 @@ public class GameScreen  extends AbstractScreen {
         };
         for (int i = 0; i < 6; i++) {
             entities.add(new Entity(map, treeCoords[i][0], treeCoords[i][1], trees.get(i)));
+        }
+    }
+
+    private void addPilar(TileMap map, int x, int y ){
+        int[][] pilarCoords = {
+                {x, y},
+                {x + 1, y},
+                {x, y - 1},
+                {x + 1, y - 1},
+                {x, y - 2},
+                {x + 1, y - 2},
+        };
+        for (int i = 0; i < 6; i++) {
+            entities.add(new Entity(map, pilarCoords[i][0],pilarCoords[i][1], pilar.get(i)));
         }
     }
 
@@ -220,6 +254,62 @@ public class GameScreen  extends AbstractScreen {
         }
     }
 
+    private void addEntrance(TileMap map, int startX, int y) {
+
+        int[][] layout = {
+                {startX, y, 4},
+                {startX + 1, y, 1},
+                {startX + 2, y, 1},
+                {startX + 3, y, 1},
+                {startX + 4, y, 1},
+                {startX + 5, y, 1},
+                {startX + 6, y, 1},
+                {startX + 7, y, 1},
+                {startX + 8, y, 2},
+                {startX, y + 1, 6},
+                {startX + 1, y + 1, 3},
+                {startX + 2, y + 1, 3},
+                {startX + 3, y + 1, 3},
+                {startX + 4, y + 1, 3},
+                {startX + 5, y + 1, 3},
+                {startX + 6, y + 1, 3},
+                {startX + 7, y + 1, 3},
+                {startX + 8, y + 1, 5}
+        };
+
+
+        for (int[] pos : layout) {
+            int x = pos[0];
+            int tileY = pos[1];
+            int textureIndex = pos[2];
+
+            TextureRegion texture;
+            switch (textureIndex) {
+                case 1:
+                    texture = new TextureRegion(pea1);
+                    break;
+                case 2:
+                    texture = new TextureRegion(pea2);
+                    break;
+                case 3:
+                    texture = new TextureRegion(pea3);
+                    break;
+                case 4:
+                    texture = new TextureRegion(pea4);
+                    break;
+                case 5:
+                    texture = new TextureRegion(pea5);
+                    break;
+                case 6:
+                    texture = new TextureRegion(pea6);
+                    break;
+                default:
+                    texture = new TextureRegion(pea1);
+                    break;
+            }
+            map.setTile(x, tileY, texture);
+        }
+    }
     private void addTile(TileMap map, int x, int y, TextureRegion tile) {
         Entity buildingTile = new Entity(map, x, y, tile);
         entities.add(buildingTile);
