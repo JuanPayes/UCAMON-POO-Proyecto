@@ -11,6 +11,10 @@ public abstract class AbstractScreen implements Screen {
     this.app = app;
     }
 
+    public Pokemon getApp() {
+        return app;
+    }
+
     public abstract void show();
 
     public abstract void  render(float delta);

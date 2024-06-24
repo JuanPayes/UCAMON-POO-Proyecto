@@ -327,6 +327,13 @@ public class GameScreen  extends AbstractScreen {
         drawGameWorld();
         drawEntities();
         drawPlayer();
+        //checkForScreenTransition();
+    }
+
+    private void checkForScreenTransition() {
+        if (player.getWorldX() == 10 && player.getWorldY() == 10) {
+            getApp().setScreen(new Floor1Screen(getApp()));
+        }
     }
 
     private void updateGameLogic(float delta) {
@@ -391,6 +398,8 @@ public class GameScreen  extends AbstractScreen {
     }
 
 
+
+
     @Override
     public void resize(int width, int height) {
 
@@ -413,7 +422,8 @@ public class GameScreen  extends AbstractScreen {
 
     @Override
     public void dispose() {
-
+        batch.dispose();
+        adventureTrack.dispose();
     }
 
 }
