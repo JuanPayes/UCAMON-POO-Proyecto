@@ -1,3 +1,4 @@
+//xd
 package Screen;
 
 import Util.AnimationSet;
@@ -14,9 +15,11 @@ import controller.PlayerController;
 import entity.*;
 import main.Pokemon;
 import main.Settings;
-
 import java.util.ArrayList;
 import java.util.List;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
+import com.badlogic.gdx.Input;
 
 public class GameScreen  extends AbstractScreen {
     private Camara camara;
@@ -24,27 +27,49 @@ public class GameScreen  extends AbstractScreen {
     private Entity player;
     private Texture playerStandingSouth;
     private SpriteBatch batch;
+    private GameState gamestate;
 
     private List<TextureRegion> store;
     private List<TextureRegion> center;
     private List<TextureRegion> trees;
     private List<Entity> entities;
     private Music adventureTrack;
+    private Music intro;
+    private Music easterEgg;
+    private Music menu;
 
     private TextureRegion[] treeTexture;
 
-    private Texture Grass1, brownGrass1,brownGrass2, brownGrass3, HighGrass, road, northRoad, southRoad, brownGrass4, brownGrass5, brownGrass6, brownGrass7;
+    private Texture Grass1, brownGrass1, brownGrass2, brownGrass3, HighGrass, road, northRoad, southRoad, brownGrass4, brownGrass5, brownGrass6, brownGrass7;
 
     private TileMap map;
 
     public GameScreen(Pokemon app) {
         super(app);
+        this.gamestate = GameState.TITLESCREEN; // Inicializa el estado del juego a la pantalla de título.
         this.control = new PlayerController(player);
 
-        adventureTrack = Gdx.audio.newMusic(Gdx.files.internal("resources/Music/adventure_Track.mp3"));
-        adventureTrack.setLooping(true);
-        adventureTrack.setVolume(0.1f);
-        adventureTrack.play();
+    adventureTrack = Gdx.audio.newMusic(Gdx.files.internal("resources/Music/adventure_Track.mp3"));
+    adventureTrack.setLooping(true);
+    adventureTrack.setVolume(0.1f);
+
+
+    intro = Gdx.audio.newMusic(Gdx.files.internal("resources/Music/Intro.mp3"));
+    intro.setLooping(true);
+    intro.setVolume(0.1f);
+
+
+    easterEgg = Gdx.audio.newMusic(Gdx.files.internal("resources/Music/EasterEgg.mp3"));
+    easterEgg.setLooping(true);
+    easterEgg.setVolume(0.1f);
+
+    menu = Gdx.audio.newMusic(Gdx.files.internal("resources/Music/Menu.mp3"));
+    menu.setLooping(true);
+    menu.setVolume(0.1f);
+
+
+
+
 
         playerStandingSouth = new Texture("resources/unpacked/RedStanding_South.png");
 
@@ -61,13 +86,13 @@ public class GameScreen  extends AbstractScreen {
         batch = new SpriteBatch();
 
         store = new ArrayList<>();
-        for (int i = 0; i < 16 ;i++){
-            store.add(new TextureRegion(new Texture("resources/Tiles/Store/pokeStore_"+i+".png")));
+        for (int i = 0; i < 16; i++) {
+            store.add(new TextureRegion(new Texture("resources/Tiles/Store/pokeStore_" + i + ".png")));
         }
 
         center = new ArrayList<>();
-        for (int i = 0; i < 25 ;i++){
-            center.add(new TextureRegion(new Texture("resources/Tiles/Center/pokeCenter_"+i+".png")));
+        for (int i = 0; i < 25; i++) {
+            center.add(new TextureRegion(new Texture("resources/Tiles/Center/pokeCenter_" + i + ".png")));
         }
 
         trees = new ArrayList<>();
@@ -88,12 +113,15 @@ public class GameScreen  extends AbstractScreen {
                 atlas.findRegion("RedStanding_West")
         );
 
-
         map = new TileMap(20, 36, Grass1);
-        int[][] treePositions = {{0, 10}, {0, 14}, {0, 18}, {18, 10}, {18, 14}, {18, 18},{18, 6},{0, 6},{0,22},{0,26},{18,22},{18,26},{18,33},{0,33}
+        int[][] treePositions = {
+                {0, 10}, {0, 14}, {0, 18}, {18, 10}, {18, 14}, {18, 18}, {18, 6},
+                {0, 6}, {0, 22}, {0, 26}, {18, 22}, {18, 26}, {18, 33}, {0, 33}
         };
-        int[][] highGrassRegions = {{10, 19, 13, 18}, {24, 27, 13, 18}, {24, 27, 2, 7}
+        int[][] highGrassRegions = {
+                {10, 19, 13, 18}, {24, 27, 13, 18}, {24, 27, 2, 7}
         };
+
         player = new Entity(map, 10, 1, animations);
         camara = new Camara();
 
@@ -126,9 +154,7 @@ public class GameScreen  extends AbstractScreen {
         }
 
         addPokeStore(map, 2, 15);
-
-        addPokeCenter(map, 2,21);
-
+        addPokeCenter(map, 2, 21);
         addHorizontalRoad(map, 0, map.getWidth() - 1, 29);
     }
 
@@ -203,12 +229,25 @@ public class GameScreen  extends AbstractScreen {
 
     @Override
     public void render(float delta) {
-        updateGameLogic(delta);
-        clearScreen();
-        drawGameWorld();
-        drawEntities();
-        drawPlayer();
+        if(gamestate==GameState.TITLESCREEN){
+            intro.play();
+            drawTitleScreen();
+        } else if (gamestate==GameState.HISOTRY) {
+            intro.pause();
+            menu.play();
+            drawStoryScreen();
+        } else if(gamestate==GameState.GAME){
+            menu.pause();
+            adventureTrack.play();
+            updateGameLogic(delta);
+            clearScreen();
+            drawGameWorld();
+            drawEntities();
+            drawPlayer();
+        }
+
     }
+
 
     private void updateGameLogic(float delta) {
         control.update(delta);
@@ -219,6 +258,35 @@ public class GameScreen  extends AbstractScreen {
     private void clearScreen() {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+    }
+
+
+    public void drawTitleScreen(){
+        batch.begin();
+        batch.draw(new Texture("resources/TitleScreen/background.png"), 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        BitmapFont font = new BitmapFont();
+        font.getData().setScale(1.6f);
+        String comenzar = "Press ENTER to start a new game" ;
+        GlyphLayout layout = new GlyphLayout(font, comenzar);
+        float x = (Gdx.graphics.getWidth() - layout.width) / 2;
+        float y = (Gdx.graphics.getHeight() + layout.height-200) / 2;
+        font.draw(batch, layout, x, y);
+        String cargar = "Press L to load";
+        layout.setText(font, cargar);
+        x = (Gdx.graphics.getWidth() - layout.width) / 2;
+        y -= layout.height + 20;
+        font.draw(batch, layout, x, y);
+
+        batch.end();
+
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
+            gamestate = GameState.HISOTRY;
+        }
+        if(Gdx.input.isKeyJustPressed(Input.Keys.L)){
+            gamestate= GameState.CARGAR;
+        }
+
     }
 
     private void drawGameWorld() {
@@ -297,5 +365,45 @@ public class GameScreen  extends AbstractScreen {
 
     }
 
+    public void drawStoryScreen() {
+        batch.begin();
+        batch.draw(new Texture("resources/Dialog/Dialog.png"), 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        BitmapFont font = new BitmapFont();
+        font.getData().setScale(1.0f);
+        font.setColor(0, 0, 0, 1);
+
+        String story = "Our adventure begins on the first day of class, when our protagonist, \n" +
+                "excited to enter UCA, encounters an unexpected accident. \n" +
+                "The legendary Pokémon Owluca  has taken control of the \n entire campus and has hypnotized  all the Pokémon and professors! \n" +
+                "It is our duty to stop him and restore peace to UCA. \n" +
+                "Only one student will be able to do it… \n";
+        String [] storyLines=story.split("\n");
+        float y = (Gdx.graphics.getHeight() + (storyLines.length * 30)) / 2;
+        for (String line : storyLines) {
+            GlyphLayout layout = new GlyphLayout(font, line);
+            float x = (Gdx.graphics.getWidth() - layout.width) / 2;
+            font.draw(batch, layout, x, y);
+            y -= layout.height + 10; // Ajusta el espaciado entre líneas según sea necesario
+        }
+
+        String continueMessage = "Press ENTER to continue..";
+        GlyphLayout continueLayout = new GlyphLayout(font, continueMessage);
+        float continueX = (Gdx.graphics.getWidth() - continueLayout.width) / 2;
+        float continueY = y - continueLayout.height - 20;
+        font.draw(batch, continueLayout, continueX, continueY);
+
+        batch.end();
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
+            gamestate = GameState.GAME;
+        }
+    }
+
+
+
+
+
+
 }
+
 

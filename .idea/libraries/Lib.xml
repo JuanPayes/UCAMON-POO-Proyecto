@@ -1,0 +1,18 @@
+<component name="libraryTable">
+  <library name="Lib">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/UCAMON/src/Lib/gdx-freetype.jar!/" />
+      <root url="jar://$PROJECT_DIR$/UCAMON/src/Lib/gdx-natives.jar!/" />
+      <root url="jar://$PROJECT_DIR$/UCAMON/src/Lib/gdx-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/UCAMON/src/Lib/gdx-tools.jar!/" />
+      <root url="jar://$PROJECT_DIR$/UCAMON/src/Lib/tween-engine-api-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/UCAMON/src/Lib/gdx-backend-lwjgl.jar!/" />
+      <root url="jar://$PROJECT_DIR$/UCAMON/src/Lib/tween-engine-api.jar!/" />
+      <root url="jar://$PROJECT_DIR$/UCAMON/src/Lib/gdx-freetype-natives.jar!/" />
+      <root url="jar://$PROJECT_DIR$/UCAMON/src/Lib/gdx.jar!/" />
+      <root url="jar://$PROJECT_DIR$/UCAMON/src/Lib/gdx-backend-lwjgl-natives.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
