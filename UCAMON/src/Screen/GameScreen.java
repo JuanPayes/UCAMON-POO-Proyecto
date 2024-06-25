@@ -46,13 +46,12 @@ public class GameScreen  extends AbstractScreen {
 
     private TextureRegion[] treeTexture;
     private Texture Grass1, brownGrass1, brownGrass2, brownGrass3, HighGrass, road, northRoad, southRoad, brownGrass4, brownGrass5, brownGrass6, brownGrass7;
-    private Texture Grass1, brownGrass1,brownGrass2, brownGrass3, HighGrass, road, northRoad, southRoad, brownGrass4, brownGrass5;
     private Texture pea1, pea2, pea3, pea4, pea5, pea6;
     private TileMap map;
 
     public GameScreen(Pokemon app) {
         super(app);
-        this.gamestate = GameState.TITLESCREEN; // Inicializa el estado del juego a la pantalla de título.
+        this.gamestate = GameState.TITLESCREEN;
         this.control = new PlayerController(player);
 
     adventureTrack = Gdx.audio.newMusic(Gdx.files.internal("resources/Music/adventure_Track.mp3"));
@@ -139,12 +138,7 @@ public class GameScreen  extends AbstractScreen {
 
         map = new TileMap(20, 36, Grass1);
 
-        int[][] treePositions = {
-                {0, 10}, {0, 14}, {0, 18}, {18, 10}, {18, 14}, {18, 18}, {18, 6},
-                {0, 6}, {0, 22}, {0, 26}, {18, 22}, {18, 26}, {18, 33}, {0, 33}
-        };
-        int[][] highGrassRegions = {
-                {10, 19, 13, 18}, {24, 27, 13, 18}, {24, 27, 2, 7}
+
 
         int[][] treePositions = {{0,2}, {18, 2},{0, 10}, {0, 14}, {0, 18}, {18, 10}, {18, 14}, {18, 18},{18, 6},{0, 6},{0,22},{0,25},{18,22},{18,25},{18,33},{0,33}
         };
@@ -365,33 +359,32 @@ public class GameScreen  extends AbstractScreen {
 
     @Override
     public void render(float delta) {
+        switch (gamestate) {
+            case TITLESCREEN:
+                intro.play();
+                drawTitleScreen();
+                break;
+            case HISOTRY:
+                intro.pause();
+                menu.play();
+                drawStoryScreen();
+                break;
+            case GAME:
+                menu.pause();
+                adventureTrack.play();
+                updateGameLogic(delta);
+                clearScreen();
+                drawGameWorld();
+                drawEntities();
+                drawPlayer();
+                break;
+            case CARGAR:
 
-        if(gamestate==GameState.TITLESCREEN){
-            intro.play();
-            drawTitleScreen();
-        } else if (gamestate==GameState.HISOTRY) {
-            intro.pause();
-            menu.play();
-            drawStoryScreen();
-        } else if(gamestate==GameState.GAME){
-            menu.pause();
-            adventureTrack.play();
-            updateGameLogic(delta);
-            clearScreen();
-            drawGameWorld();
-            drawEntities();
-            drawPlayer();
+                break;
+            default:
+                break;
         }
-
-
-        updateGameLogic(delta);
-        clearScreen();
-        drawGameWorld();
-        drawEntities();
-        drawPlayer();
-        //checkForScreenTransition();
     }
-
     private void checkForScreenTransition() {
         if (player.getWorldX() == 10 && player.getWorldY() == 10) {
             getApp().setScreen(new Floor1Screen(getApp()));
