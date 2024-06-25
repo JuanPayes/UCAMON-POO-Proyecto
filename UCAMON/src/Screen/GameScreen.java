@@ -642,6 +642,7 @@ public class GameScreen  extends AbstractScreen {
     }
 
 public void drawBag(){
+        /*
     batch.begin();
 
     // Dibujar la imagen del bolso (bag)
@@ -663,6 +664,8 @@ public void drawBag(){
     if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
         gamestate = GameState.PAUSE;
     }
+
+         */
 }
 }
 
