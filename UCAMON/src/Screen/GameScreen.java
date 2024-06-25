@@ -11,10 +11,13 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import controller.PlayerController;
 import entity.*;
 import main.Pokemon;
 import main.Settings;
+
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -43,6 +46,9 @@ public class GameScreen  extends AbstractScreen {
     private Music intro;
     private Music easterEgg;
     private Music menu;
+    private boolean showSaveConfirmation;
+    private float saveConfirmationTime;
+    private String saveMessage;
 
     private TextureRegion[] treeTexture;
     private Texture Grass1, brownGrass1, brownGrass2, brownGrass3, HighGrass, road, northRoad, southRoad, brownGrass4, brownGrass5, brownGrass6, brownGrass7;
@@ -359,6 +365,13 @@ public class GameScreen  extends AbstractScreen {
 
     @Override
     public void render(float delta) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+            if (gamestate == GameState.GAME) {
+                gamestate = GameState.PAUSE;
+            } else if (gamestate == GameState.PAUSE) {
+                gamestate = GameState.GAME;
+            }
+        }
         switch (gamestate) {
             case TITLESCREEN:
                 intro.play();
@@ -381,8 +394,22 @@ public class GameScreen  extends AbstractScreen {
             case CARGAR:
 
                 break;
+            case PAUSE:
+                adventureTrack.pause();
+                drawPauseMenu();
+                break;
+            case BAG:
+                drawBag();
+                break;
             default:
                 break;
+        }
+        if (showSaveConfirmation) {
+            drawSaveConfirmationMessage();
+            saveConfirmationTime -= delta;
+            if (saveConfirmationTime <= 0) {
+                showSaveConfirmation = false;
+            }
         }
     }
     private void checkForScreenTransition() {
@@ -547,10 +574,99 @@ public class GameScreen  extends AbstractScreen {
     }
 
 
+    public void drawPauseMenu() {
+        batch.begin();
+        BitmapFont font = new BitmapFont();
+        font.getData().setScale(1.6f);
+
+        String[] options = { "Bag", "Save Game", "Quit Game", "Return to Title" };
+        float y = Gdx.graphics.getHeight() / 2 + options.length * 20;
+        for (String option : options) {
+            GlyphLayout layout = new GlyphLayout(font, option);
+            float x = (Gdx.graphics.getWidth() - layout.width) / 2;
+            font.draw(batch, layout, x, y);
+            y -= layout.height + 20;
+        }
+
+        batch.end();
+
+        handlePauseMenuInput();
+    }
+
+    public void handlePauseMenuInput() {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)) {
+            // Handle Bag
+        } else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_2)) {
+             handleSaveGame();
+        } else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_3)) {
+            Gdx.app.exit();
+        } else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_4)) {
+            gamestate = GameState.TITLESCREEN;
+        }
+    }
+
+    public void handleSaveGame() {
+        saveGame();
+        saveMessage = "Game saved successfully.";
+        showSaveConfirmation = true;
+        saveConfirmationTime = 3.0f;
+    }
+
+    public void saveGame() {
+
+    }
 
 
 
+    private void drawSaveConfirmationMessage() {
+        batch.begin();
 
+        // Configurar el fondo del mensaje
+        TextureRegion background = new TextureRegion(new Texture(Gdx.files.internal("resources/Dialog/Message.png"))); // Reemplaza "background.png" con tu imagen de fondo
+        float bgWidth = Gdx.graphics.getWidth() * 0.8f; // Ancho del fondo
+        float bgHeight = 60; // Alto del fondo
+        float bgX = (Gdx.graphics.getWidth() - bgWidth) / 2; // Posición X del fondo
+        float bgY = Gdx.graphics.getHeight() / 2 - bgHeight / 2; // Posición Y del fondo
+        batch.draw(background, bgX, bgY, bgWidth, bgHeight);
+
+        // Configurar el texto
+        BitmapFont font = new BitmapFont();
+        font.getData().setScale(1.0f);
+        font.setColor(0, 0, 0, 1);
+        GlyphLayout layout = new GlyphLayout(font, "Game saved successfully!");
+        float textX = (Gdx.graphics.getWidth() - layout.width) / 2; // Posición X del texto
+        float textY = Gdx.graphics.getHeight() / 2 + layout.height / 2; // Posición Y del texto
+        font.draw(batch, layout, textX, textY);
+
+        batch.end();
+    }
+
+public void drawBag(){
+    batch.begin();
+
+    // Dibujar la imagen del bolso (bag)
+    Texture bagImage = new Texture(""); // Reemplaza con la ruta de tu imagen
+    float bagX = (Gdx.graphics.getWidth() - bagImage.getWidth()) / 2;
+    float bagY = (Gdx.graphics.getHeight() - bagImage.getHeight()) / 2;
+    batch.draw(bagImage, bagX, bagY);
+
+    // Dibujar texto para volver al menú principal
+    BitmapFont font = new BitmapFont();
+    font.getData().setScale(1.2f);
+    GlyphLayout layout = new GlyphLayout(font, "Press ESC to return to main menu");
+    float textX = (Gdx.graphics.getWidth() - layout.width) / 2;
+    float textY = 50;
+    font.draw(batch, layout, textX, textY);
+
+    batch.end();
+
+    if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+        gamestate = GameState.PAUSE;
+    }
 }
+}
+
+
+
 
 
