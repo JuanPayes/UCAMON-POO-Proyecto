@@ -192,10 +192,6 @@ public class GameScreen  extends AbstractScreen {
         addPokeStore(map, 2, 15);
 
         addPokeCenter(map, 2, 21);
-        addHorizontalRoad(map, 0, map.getWidth() - 1, 29);
-
-
-        addPokeCenter(map, 2,21);
 
         addHorizontalRoad(map, 0, map.getWidth() - 1, 28);
 
