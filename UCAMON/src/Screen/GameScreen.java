@@ -591,7 +591,7 @@ public class GameScreen  extends AbstractScreen {
 
     public void handlePauseMenuInput() {
         if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)) {
-            // Handle Bag
+            drawBag();
         } else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_2)) {
              handleSaveGame();
         } else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_3)) {
@@ -638,16 +638,35 @@ public class GameScreen  extends AbstractScreen {
     }
 
 public void drawBag(){
-        /*
+gamestate=GameState.BAG;
     batch.begin();
+    TextureRegion bagImage = new TextureRegion(new Texture(Gdx.files.internal("resources/Bag/Bag.png")));
 
-    // Dibujar la imagen del bolso (bag)
-    Texture bagImage = new Texture(""); // Reemplaza con la ruta de tu imagen
-    float bagX = (Gdx.graphics.getWidth() - bagImage.getWidth()) / 2;
-    float bagY = (Gdx.graphics.getHeight() - bagImage.getHeight()) / 2;
-    batch.draw(bagImage, bagX, bagY);
+    // Obtener las dimensiones originales de la imagen
+    float imageWidth = bagImage.getRegionWidth();
+    float imageHeight = bagImage.getRegionHeight();
 
-    // Dibujar texto para volver al menú principal
+    // Dimensiones de la pantalla
+    float screenWidth = Gdx.graphics.getWidth();
+    float screenHeight = Gdx.graphics.getHeight();
+
+    // Calcular el factor de escala para ajustar la imagen dentro de la pantalla manteniendo la proporción
+    float scale = Math.min(screenWidth / imageWidth, screenHeight / imageHeight);
+
+    // Calcular el nuevo tamaño de la imagen escalada
+    float scaledWidth = imageWidth * scale;
+    float scaledHeight = imageHeight * scale;
+
+    // Calcular la posición para centrar la imagen escalada en la pantalla
+    float bgX = (screenWidth - scaledWidth) / 2; // Posición X centrada
+    float bgY = (screenHeight - scaledHeight) / 2; // Posición Y centrada
+
+    // Dibujar la imagen del bolso escalada
+    batch.draw(bagImage, bgX, bgY, scaledWidth, scaledHeight);
+
+
+
+
     BitmapFont font = new BitmapFont();
     font.getData().setScale(1.2f);
     GlyphLayout layout = new GlyphLayout(font, "Press ESC to return to main menu");
@@ -661,7 +680,7 @@ public void drawBag(){
         gamestate = GameState.PAUSE;
     }
 
-         */
+
 }
 }
 
