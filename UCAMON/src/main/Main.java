@@ -16,4 +16,3 @@ public class Main {
         new LwjglApplication(new Pokemon(), config);
     }
 }
-
