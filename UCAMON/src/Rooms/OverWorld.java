@@ -106,8 +106,6 @@ public class OverWorld extends Room {
         addEntrance(map, 6, 0);
 
         // Añadir entidad del jugador
-        AnimationSet animations = new AnimationSet(/* animaciones del jugador */);
-        entities.add(new Entity(map, 10, 1, animations));
     }
 
     private void addTree(TileMap map, int x, int y) {
