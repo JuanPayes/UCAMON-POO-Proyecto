@@ -104,8 +104,6 @@ public class OverWorld extends Room {
         addHorizontalRoad(map, 0, map.getWidth() - 1, 28);
         addUcaLib(map, 6, 35);
         addEntrance(map, 6, 0);
-
-        // Añadir entidad del jugador
     }
 
     @Override
