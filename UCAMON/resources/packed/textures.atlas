@@ -4,7 +4,7 @@ size: 1024,64
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
-NPC1_Standing_South
+NPC1_Walking_South
   rotate: false
   xy: 2, 2
   size: 16, 24
@@ -18,98 +18,98 @@ NPC_Standing_East
   orig: 32, 32
   offset: 0, 0
   index: -1
-NPC_Standing_East
+NPC_Walking_East
   rotate: false
   xy: 2, 28
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 1
-NPC_Standing_East
+NPC_Standing_North
   rotate: false
   xy: 36, 28
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
-  index: 0
-NPC_Standing_East
+  index: -1
+NPC_Walking_North
+  rotate: false
+  xy: 36, 28
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 1
+NPC_Standing_South
   rotate: false
   xy: 70, 28
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
-  index: 2
-NPC_Standing_North
+  index: -1
+NPC_Walking_South
+  rotate: false
+  xy: 70, 28
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 1
+NPC_Standing_West
   rotate: false
   xy: 104, 28
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
-NPC_Standing_North
+NPC_Walking_West 
   rotate: false
   xy: 104, 28
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 1
-NPC_Standing_North
+NPC_Walking_East
   rotate: false
   xy: 138, 28
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 0
-NPC_Standing_North
+NPC_Walking_East
   rotate: false
   xy: 172, 28
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 2
-NPC_Standing_South
+NPC_Walking_North
   rotate: false
   xy: 206, 28
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
-  index: -1
-NPC_Standing_South
-  rotate: false
-  xy: 206, 28
-  size: 32, 32
-  orig: 32, 32
-  offset: 0, 0
-  index: 1
-NPC_Standing_South
+  index: 0
+NPC_Walking_North
   rotate: false
   xy: 240, 28
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 2
-NPC_Standing_West
+NPC_Walking_South
   rotate: false
   xy: 274, 28
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
-  index: -1
-NPC_Standing_West 
-  rotate: false
-  xy: 274, 28
-  size: 32, 32
-  orig: 32, 32
-  offset: 0, 0
-  index: 1
-NPC_Standing_West
+  index: 2
+NPC_Walking_West
   rotate: false
   xy: 308, 28
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 0
-NPC_Standing_West
+NPC_Walking_West
   rotate: false
   xy: 342, 28
   size: 32, 32

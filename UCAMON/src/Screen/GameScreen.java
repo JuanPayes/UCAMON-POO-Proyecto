@@ -11,13 +11,11 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import controller.PlayerController;
 import entity.*;
 import main.Pokemon;
 import main.Settings;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -25,10 +23,13 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.Input;
 
 public class GameScreen  extends AbstractScreen {
+    private BitmapFont font;
     private Camara camara;
     private PlayerController control;
-    private Entity player;
-    private Texture playerStandingSouth;
+    private Entity player, npcOne;
+    AnimationSet npcAnimations;
+    private Texture playerStandingSouth, npcOneTexture, dialogBoxTexture;
+    private boolean isCinematicActive, isDialogueActive, shouldNpcMove;
     private SpriteBatch batch;
 
     private GameState gamestate;
@@ -42,13 +43,16 @@ public class GameScreen  extends AbstractScreen {
     private List<Entity> entities;
     private List<TextureRegion> librery;
 
+    private List<String> npcDialogues;
+    private int currentDialogueIndex;
+
     private Music adventureTrack;
     private Music intro;
     private Music easterEgg;
     private Music menu;
     private boolean showSaveConfirmation;
     private float saveConfirmationTime;
-    private String saveMessage;
+    private String saveMessage, npcDialogueText;
 
     private TextureRegion[] treeTexture;
     private Texture Grass1, brownGrass1, brownGrass2, brownGrass3, HighGrass, road, northRoad, southRoad, brownGrass4, brownGrass5, brownGrass6, brownGrass7;
@@ -77,9 +81,6 @@ public class GameScreen  extends AbstractScreen {
     menu = Gdx.audio.newMusic(Gdx.files.internal("resources/Music/Menu.mp3"));
     menu.setLooping(true);
     menu.setVolume(0.1f);
-
-
-
 
 
         playerStandingSouth = new Texture("resources/unpacked/RedStanding_South.png");
@@ -142,9 +143,41 @@ public class GameScreen  extends AbstractScreen {
                 atlas.findRegion("RedStanding_West")
         );
 
+        //TextureAtlas npcAtlas = app.getAssetManager().get("resources/packed/npc_textures.atlas", TextureAtlas.class);
+
+        npcAnimations = new AnimationSet(
+                new Animation(0.3f / 2f, atlas.findRegions("NPC_Walking_North"), PlayMode.LOOP_PINGPONG),
+                new Animation(0.3f / 2f, atlas.findRegions("NPC_Walking_South"), PlayMode.LOOP_PINGPONG),
+                new Animation(0.3f / 2f, atlas.findRegions("NPC_Walking_East"), PlayMode.LOOP_PINGPONG),
+                new Animation(0.3f / 2f, atlas.findRegions("NPC_Walking_West"), PlayMode.LOOP_PINGPONG),
+                atlas.findRegion("NPC_Standing_North"),
+                atlas.findRegion("NPC_Standing_South"),
+                atlas.findRegion("NPC_Standing_East"),
+                atlas.findRegion("NPC_Standing_West")
+        );
+
         map = new TileMap(20, 36, Grass1);
 
+        npcOneTexture = new Texture("resources/unpacked/NPC_Standing_South.png");
 
+        font = new BitmapFont();
+        font.getData().setScale(1.0f);
+        font.setColor(0, 0, 0, 1);
+        dialogBoxTexture = new Texture("resources/Dialog/textBox.png");
+        npcDialogueText = "";
+        isDialogueActive = false;
+
+        npcDialogues = new ArrayList<>();
+        npcDialogues.add("Hey! This place is absolute chaos!");
+        npcDialogues.add("You want to go in? Here, I'll give you a couple of \nthings that can help! \n(the NPC has has given you 100 coins, lucky you!).");
+        npcDialogues.add("That's all I have left. When the pokemon \nwent crazy, they stole all my money!");
+        npcDialogues.add("Surely whenever you defeat one, \nthey'll drop some of the money they stole from me! \nThose darn pokemon...");
+        npcDialogues.add("Anyway, here, to help you in your journey, \nchoose one of these pokemon. \nI hope they help in your adventure!");
+        npcDialogues.add("1. Charmander. \n2. Bulbasaur.\n3. Squirtle.");
+        npcDialogues.add("Remember, Pokemons that are faster than yours \nattack first, so be careful!");
+        npcDialogues.add("Oh, one more thing! I've heard people say there is an extremely \nrare pokemon roaming around... beware if you find it, \nit must be very powerful!");
+        npcDialogues.add("That's all I can do for you! \nPlease beware and save us all from OwlUCA!");
+        currentDialogueIndex = 0;
 
         int[][] treePositions = {{0,2}, {18, 2},{0, 10}, {0, 14}, {0, 18}, {18, 10}, {18, 14}, {18, 18},{18, 6},{0, 6},{0,22},{0,25},{18,22},{18,25},{18,33},{0,33}
         };
@@ -199,6 +232,17 @@ public class GameScreen  extends AbstractScreen {
 
         addEntrance(map, 6, 0);
 
+        addNPC(map, 6, 4);
+        startCinematic();
+    }
+
+    private void addNPC(TileMap map, int x, int y) {
+        npcOne = new Entity(map, x, y, npcAnimations);
+        entities.add(npcOne);
+    }
+
+    private void startCinematic() {
+        isCinematicActive = true;
     }
 
     private void addTree(TileMap map, int x, int y) {
@@ -356,7 +400,9 @@ public class GameScreen  extends AbstractScreen {
 
     @Override
     public void show() {
-        Gdx.input.setInputProcessor(control);
+        if (!isCinematicActive && !isDialogueActive) {
+            Gdx.input.setInputProcessor(control);
+        }
     }
 
     @Override
@@ -368,6 +414,19 @@ public class GameScreen  extends AbstractScreen {
                 gamestate = GameState.GAME;
             }
         }
+
+        if (isDialogueActive && Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
+            currentDialogueIndex++;
+            if (currentDialogueIndex < npcDialogues.size()) {
+                npcDialogueText = npcDialogues.get(currentDialogueIndex);
+            } else {
+                isDialogueActive = false;
+                Gdx.input.setInputProcessor(control);
+                shouldNpcMove = true;
+                npcOne.setState(ACTORSTATE.WALKING);
+            }
+        }
+
         switch (gamestate) {
             case TITLESCREEN:
                 intro.play();
@@ -381,11 +440,19 @@ public class GameScreen  extends AbstractScreen {
             case GAME:
                 menu.pause();
                 adventureTrack.play();
-                updateGameLogic(delta);
+                if (isCinematicActive) {
+                    updateCinematic(delta);
+                }else{
+                    updateGameLogic(delta);
+                }
                 clearScreen();
                 drawGameWorld();
                 drawEntities();
                 drawPlayer();
+                updateCamera();
+                if (isDialogueActive) {
+                    drawDialogueBox();
+                }
                 break;
             case CARGAR:
 
@@ -396,6 +463,17 @@ public class GameScreen  extends AbstractScreen {
                 break;
             case BAG:
                 drawBag();
+                break;
+            case CINEMATIC:
+                updateCinematic(delta);
+                clearScreen();
+                drawGameWorld();
+                drawEntities();
+                drawPlayer();
+                updateCamera();
+                if (isDialogueActive) {
+                    drawDialogueBox();
+                }
                 break;
             default:
                 break;
@@ -408,6 +486,46 @@ public class GameScreen  extends AbstractScreen {
             }
         }
     }
+
+    private void updateCinematic(float delta) {
+        npcOne.update(delta);
+        if (npcOne.getState() == ACTORSTATE.STANDING) {
+            if (npcReachedPlayer()) {
+                startDialogue();
+                isCinematicActive = false;
+            } else {
+                moveNpcTowardsPlayer();
+            }
+        }
+    }
+
+    private void startDialogue() {
+        isDialogueActive = true;
+        currentDialogueIndex = 0;
+        npcDialogueText = npcDialogues.get(currentDialogueIndex);
+    }
+
+    private boolean npcReachedPlayer() {
+        return (npcOne.getX() == player.getX() && Math.abs(npcOne.getY() - player.getY()) == 1) ||
+                (npcOne.getY() == player.getY() && Math.abs(npcOne.getX() - player.getX()) == 1);
+    }
+
+    private void moveNpcTowardsPlayer() {
+        int playerX = player.getX();
+        int playerY = player.getY();
+
+
+        if (npcOne.getX() < playerX) {
+            npcOne.move(DIRECTION.EAST);
+        } else if (npcOne.getX() > playerX) {
+            npcOne.move(DIRECTION.WEST);
+        } else if (npcOne.getY() < playerY - 1) {
+            npcOne.move(DIRECTION.NORTH);
+        } else if (npcOne.getY() > playerY + 1) {
+            npcOne.move(DIRECTION.SOUTH);
+        }
+    }
+
     private void checkForScreenTransition() {
         if (player.getWorldX() == 10 && player.getWorldY() == 10) {
             getApp().setScreen(new Floor1Screen(getApp()));
@@ -417,9 +535,26 @@ public class GameScreen  extends AbstractScreen {
 
 
     private void updateGameLogic(float delta) {
-        control.update(delta);
-        player.update(delta);
+        if (!isCinematicActive && !isDialogueActive) {
+            control.update(delta);
+            player.update(delta);
+            if (shouldNpcMove) {
+                moveNpcAfterDialogue(delta);
+            }
+        }
         updateCamera();
+    }
+
+    private void moveNpcAfterDialogue(float delta) {
+        int targetX = 5;
+
+        if (npcOne.getX() > targetX) {
+            npcOne.move(DIRECTION.WEST);
+            npcOne.update(delta);
+        } else {
+            shouldNpcMove = false;
+            npcOne.setState(ACTORSTATE.STANDING);
+        }
     }
 
     private void clearScreen() {
@@ -507,8 +642,6 @@ public class GameScreen  extends AbstractScreen {
     }
 
 
-
-
     @Override
     public void resize(int width, int height) {
 
@@ -575,7 +708,7 @@ public class GameScreen  extends AbstractScreen {
         BitmapFont font = new BitmapFont();
         font.getData().setScale(1.6f);
 
-        String[] options = { "Bag", "Save Game", "Quit Game", "Return to Title" };
+        String[] options = { "Bag", "Save Game", "Quit Game", "Return" };
         float y = Gdx.graphics.getHeight() / 2 + options.length * 20;
         for (String option : options) {
             GlyphLayout layout = new GlyphLayout(font, option);
@@ -597,7 +730,7 @@ public class GameScreen  extends AbstractScreen {
         } else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_3)) {
             Gdx.app.exit();
         } else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_4)) {
-            gamestate = GameState.TITLESCREEN;
+            gamestate = GameState.GAME;
         }
     }
 
@@ -618,7 +751,7 @@ public class GameScreen  extends AbstractScreen {
         batch.begin();
 
         // Configurar el fondo del mensaje
-        TextureRegion background = new TextureRegion(new Texture(Gdx.files.internal("resources/Dialog/Message.png"))); // Reemplaza "background.png" con tu imagen de fondo
+        TextureRegion background = new TextureRegion(new Texture(Gdx.files.internal("resources/Dialog/textBox.png")));
         float bgWidth = Gdx.graphics.getWidth() * 0.8f; // Ancho del fondo
         float bgHeight = 60; // Alto del fondo
         float bgX = (Gdx.graphics.getWidth() - bgWidth) / 2; // Posición X del fondo
@@ -635,6 +768,27 @@ public class GameScreen  extends AbstractScreen {
         font.draw(batch, layout, textX, textY);
 
         batch.end();
+    }
+
+    private void drawDialogueBox() {
+        if (isDialogueActive) {
+            batch.begin();
+
+
+            float dialogBoxWidth = Gdx.graphics.getWidth() * 0.8f;
+            float dialogBoxHeight = Gdx.graphics.getHeight() * 0.2f;
+            float dialogBoxX = (Gdx.graphics.getWidth() - dialogBoxWidth) / 2;
+            float dialogBoxY = Gdx.graphics.getHeight() * 0.1f;
+            batch.draw(dialogBoxTexture, dialogBoxX, dialogBoxY, dialogBoxWidth, dialogBoxHeight);
+
+
+            GlyphLayout layout = new GlyphLayout(font, npcDialogueText);
+            float textX = dialogBoxX + (dialogBoxWidth - layout.width) / 2;
+            float textY = dialogBoxY + (dialogBoxHeight + layout.height) / 2;
+            font.draw(batch, layout, textX, textY);
+
+            batch.end();
+        }
     }
 
 public void drawBag(){

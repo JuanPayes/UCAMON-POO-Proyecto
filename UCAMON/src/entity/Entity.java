@@ -8,8 +8,8 @@ import com.badlogic.gdx.math.Interpolation;
 
 public class Entity {
 
-    private int x;
-    private int y;
+    protected int x;
+    protected int y;
     private TileMap map;
     private DIRECTION facing;
 
@@ -22,18 +22,15 @@ public class Entity {
     private float walkTimer;
     private boolean moveRequestThisFrame;
 
-    private ACTOR_STATE state;
+    protected ACTORSTATE state;
 
     private AnimationSet animations;
     private TextureRegion staticTexture;
 
-    public enum ACTOR_STATE {
-        WALKING,
-        STANDING,
-        ;
+    public Entity() {
     }
 
-    public Entity(TileMap map,int x, int y, AnimationSet animations) {
+    public Entity(TileMap map, int x, int y, AnimationSet animations) {
         this.map = map;
         this.x = x;
         this.y = y;
@@ -41,7 +38,7 @@ public class Entity {
         this.worldY = y;
         this.animations = animations;
         map.getTile(x,y).setEntity(this);
-        this.state = ACTOR_STATE.STANDING;
+        this.state = ACTORSTATE.STANDING;
         this.facing = DIRECTION.SOUTH;
     }
 
@@ -52,13 +49,13 @@ public class Entity {
         this.worldX = x;
         this.worldY = y;
         this.staticTexture = staticTexture;
-        this.state = ACTOR_STATE.STANDING;
+        this.state = ACTORSTATE.STANDING;
         this.facing = DIRECTION.SOUTH;
         map.getTile(x,y).setEntity(this);
     }
 
     public boolean move(DIRECTION dir){
-        if (state == ACTOR_STATE.WALKING) {
+        if (state == ACTORSTATE.WALKING) {
             if (facing == dir) {
                 moveRequestThisFrame = true;
             }
@@ -87,11 +84,11 @@ public class Entity {
         this.worldX = x;
         this.worldY = y;
         animTimer = 0f;
-        state = ACTOR_STATE.WALKING;
+        state = ACTORSTATE.WALKING;
     }
 
     private void finishMove(){
-        state = ACTOR_STATE.STANDING;
+        state = ACTORSTATE.STANDING;
         this.worldX = destX;
         this.worldY = destY;
         this.srcX = 0;
@@ -101,7 +98,7 @@ public class Entity {
     }
 
     public void update(float delta){
-        if(state == ACTOR_STATE.WALKING){
+        if(state == ACTORSTATE.WALKING){
             animTimer += delta;
             walkTimer += delta;
             worldX = Interpolation.linear.apply(srcX, destX, animTimer/ANIM_TIME);
@@ -122,9 +119,9 @@ public class Entity {
 
     public TextureRegion getSprite() {
         if (animations != null) {
-            if (state == ACTOR_STATE.WALKING) {
+            if (state == ACTORSTATE.WALKING) {
                 return animations.getWalkingAnimation(facing).getKeyFrame(walkTimer, true);
-            } else if (state == ACTOR_STATE.STANDING) {
+            } else if (state == ACTORSTATE.STANDING) {
                 return animations.getStandingAnimation(facing);
             }
             return animations.getStandingAnimation(DIRECTION.SOUTH);
@@ -155,5 +152,13 @@ public class Entity {
 
     public float getWorldY(){
         return worldY;
+    }
+
+    public ACTORSTATE getState() {
+        return state;
+    }
+
+    public void setState(ACTORSTATE state) {
+        this.state = state;
     }
 }
