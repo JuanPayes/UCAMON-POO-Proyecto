@@ -3,6 +3,7 @@ package Screen;
 import Rooms.Floor1;
 import Rooms.OverWorld;
 import Rooms.Room;
+import Rooms.RoomPosition;
 import Util.AnimationSet;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
@@ -17,6 +18,7 @@ import entity.*;
 import main.Pokemon;
 import main.Settings;
 
+import java.util.Stack;
 import java.util.ArrayList;
 import java.util.List;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -42,6 +44,8 @@ public class GameScreen extends AbstractScreen {
     private boolean showSaveConfirmation;
     private float saveConfirmationTime;
     private String saveMessage;
+
+    private Stack<RoomPosition> roomStack;
 
     public GameScreen(Pokemon app) {
         super(app);
@@ -94,6 +98,8 @@ public class GameScreen extends AbstractScreen {
         player = new Entity(currentFloor.getMap(), 10, 1, animations);
         camara = new Camara();
         control = new PlayerController(player);
+
+        roomStack = new Stack<>();
     }
 
     @Override
@@ -111,8 +117,12 @@ public class GameScreen extends AbstractScreen {
             }
         }
 
-        if (gamestate == GameState.GAME && player.getX() == 10 && player.getY() == 30 && Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
-            changeRoom();
+        if (gamestate == GameState.GAME) {
+            if (currentFloor.getId().equals("OverWorld") && player.getX() == 10 && player.getY() == 30 && Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
+                changeRoom();
+            } else if (currentFloor.getId().equals("Floor1") && player.getX() == 7 && player.getY() == 0 && Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
+                returnToPreviousRoom();
+            }
         }
 
         switch (gamestate) {
@@ -157,6 +167,9 @@ public class GameScreen extends AbstractScreen {
     }
 
     protected void changeRoom() {
+
+        roomStack.push(new RoomPosition(currentFloor, player.getX(), player.getY(), new ArrayList<>(entities)));
+
         // Limpiar entidades del cuarto actual
         entities.clear();
 
@@ -168,11 +181,11 @@ public class GameScreen extends AbstractScreen {
             }
         }
 
-        // Crear e inicializar NewRoom
+        // Crear e inicializar floor1
         Floor1 floor1 = new Floor1(entities);
         floor1.initialize();
 
-        // Establecer el cuarto actual como NewRoom
+        // Establecer el cuarto actual como floor1
         this.currentFloor = floor1;
 
         // Reubicar al jugador en la nueva habitación
@@ -182,6 +195,35 @@ public class GameScreen extends AbstractScreen {
 
         // Añadir el jugador al nuevo mapa
         floor1.getMap().getTile(player.getX(), player.getY()).setEntity(player);
+    }
+
+    protected void returnToPreviousRoom() {
+        if (!roomStack.isEmpty()) {
+            RoomPosition previousRoom = roomStack.pop();
+
+            entities.clear();
+
+            TileMap oldMap = currentFloor.getMap();
+            for (int x = 0; x < oldMap.getWidth(); x++) {
+                for (int y = 0; y < oldMap.getHeight(); y++) {
+                    oldMap.getTile(x, y).setEntity(null);
+                }
+            }
+
+            this.currentFloor = previousRoom.getRoom();
+
+            player.setX(previousRoom.getX());
+            player.setY(previousRoom.getY());
+            player.setMap(currentFloor.getMap());
+
+            entities.addAll(previousRoom.getEntities());
+
+            for (Entity entity : entities){
+                currentFloor.getMap().getTile(entity.getX(), entity.getY()).setEntity(entity);
+            }
+
+            currentFloor.getMap().getTile(player.getX(), player.getY()).setEntity(player);
+        }
     }
 
     protected void updateGameLogic(float delta) {

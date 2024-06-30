@@ -29,4 +29,9 @@ public class Floor1 extends Room{
         }
         this.map = floor;
     }
+
+    @Override
+    public String getId() {
+        return "Floor1";
+    }
 }

@@ -108,6 +108,11 @@ public class OverWorld extends Room {
         // Añadir entidad del jugador
     }
 
+    @Override
+    public String getId() {
+        return "OverWorld";
+    }
+
     private void addTree(TileMap map, int x, int y) {
         int[][] treeCoords = {
                 {x, y},
