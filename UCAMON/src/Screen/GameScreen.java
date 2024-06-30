@@ -1,13 +1,14 @@
-//xd
 package Screen;
 
+import Rooms.Floor1;
+import Rooms.OverWorld;
 import Rooms.Room;
+import Rooms.RoomPosition;
 import Util.AnimationSet;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -17,13 +18,14 @@ import entity.*;
 import main.Pokemon;
 import main.Settings;
 
+import java.util.Stack;
 import java.util.ArrayList;
 import java.util.List;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.Input;
 
-public class GameScreen  extends AbstractScreen {
+public class GameScreen extends AbstractScreen {
     private Camara camara;
     private PlayerController control;
     private Entity player;
@@ -33,9 +35,7 @@ public class GameScreen  extends AbstractScreen {
 
     private GameState gamestate;
 
-    
     private List<Entity> entities;
-    private List<TextureRegion> librery;
 
     private Music adventureTrack;
     private Music intro;
@@ -45,12 +45,11 @@ public class GameScreen  extends AbstractScreen {
     private float saveConfirmationTime;
     private String saveMessage;
 
-    private TileMap map;
+    private Stack<RoomPosition> roomStack;
 
     public GameScreen(Pokemon app) {
         super(app);
         this.gamestate = GameState.TITLESCREEN;
-        this.control = new PlayerController(player);
 
         adventureTrack = Gdx.audio.newMusic(Gdx.files.internal("resources/Music/adventure_Track.mp3"));
         adventureTrack.setLooping(true);
@@ -75,27 +74,33 @@ public class GameScreen  extends AbstractScreen {
         TextureAtlas atlas = app.getAssetManager().get("resources/packed/textures.atlas", TextureAtlas.class);
 
         AnimationSet animations = new AnimationSet(
-                new Animation(0.3f / 2f, atlas.findRegions("RedWalking_North"), PlayMode.LOOP_PINGPONG),
-                new Animation(0.3f / 2f, atlas.findRegions("RedWalking_South"), PlayMode.LOOP_PINGPONG),
-                new Animation(0.3f / 2f, atlas.findRegions("RedWalking_East"), PlayMode.LOOP_PINGPONG),
-                new Animation(0.3f / 2f, atlas.findRegions("RedWalking_West"), PlayMode.LOOP_PINGPONG),
+                new Animation(0.3f / 2f, atlas.findRegions("RedWalking_North"), Animation.PlayMode.LOOP_PINGPONG),
+                new Animation(0.3f / 2f, atlas.findRegions("RedWalking_South"), Animation.PlayMode.LOOP_PINGPONG),
+                new Animation(0.3f / 2f, atlas.findRegions("RedWalking_East"), Animation.PlayMode.LOOP_PINGPONG),
+                new Animation(0.3f / 2f, atlas.findRegions("RedWalking_West"), Animation.PlayMode.LOOP_PINGPONG),
                 atlas.findRegion("RedStanding_North"),
                 atlas.findRegion("RedStanding_South"),
                 atlas.findRegion("RedStanding_East"),
                 atlas.findRegion("RedStanding_West")
         );
 
-        map = new TileMap(20, 36, Grass1);
-
-        player = new Entity(map, 10, 1, animations);
-        camara = new Camara();
-
-        control = new PlayerController(player);
-
+        // Inicializar la lista de entidades
         entities = new ArrayList<>();
 
-    }
+        // Crear e inicializar OverWorld
+        OverWorld overWorld = new OverWorld(new TileMap(20, 36, new Texture("resources/Tiles/grass.png")), entities);
+        overWorld.initialize();
 
+        // Establecer el cuarto actual como OverWorld
+        this.currentFloor = overWorld;
+
+        // Crear el jugador y establecer su controlador
+        player = new Entity(currentFloor.getMap(), 10, 1, animations);
+        camara = new Camara();
+        control = new PlayerController(player);
+
+        roomStack = new Stack<>();
+    }
 
     @Override
     public void show() {
@@ -111,6 +116,15 @@ public class GameScreen  extends AbstractScreen {
                 gamestate = GameState.GAME;
             }
         }
+
+        if (gamestate == GameState.GAME) {
+            if (currentFloor.getId().equals("OverWorld") && player.getX() == 10 && player.getY() == 30 && Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
+                changeRoom();
+            } else if (currentFloor.getId().equals("Floor1") && player.getX() == 7 && player.getY() == 0 && Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
+                returnToPreviousRoom();
+            }
+        }
+
         switch (gamestate) {
             case TITLESCREEN:
                 intro.play();
@@ -129,10 +143,9 @@ public class GameScreen  extends AbstractScreen {
                 drawGameWorld();
                 drawEntities();
                 drawPlayer();
-                //
                 break;
             case CARGAR:
-
+                // Implementar lógica de carga aquí
                 break;
             case PAUSE:
                 adventureTrack.pause();
@@ -153,7 +166,65 @@ public class GameScreen  extends AbstractScreen {
         }
     }
 
+    protected void changeRoom() {
 
+        roomStack.push(new RoomPosition(currentFloor, player.getX(), player.getY(), new ArrayList<>(entities)));
+
+        // Limpiar entidades del cuarto actual
+        entities.clear();
+
+        // Limpiar entidades del mapa actual
+        TileMap oldMap = currentFloor.getMap();
+        for (int x = 0; x < oldMap.getWidth(); x++) {
+            for (int y = 0; y < oldMap.getHeight(); y++) {
+                oldMap.getTile(x, y).setEntity(null);
+            }
+        }
+
+        // Crear e inicializar floor1
+        Floor1 floor1 = new Floor1(entities);
+        floor1.initialize();
+
+        // Establecer el cuarto actual como floor1
+        this.currentFloor = floor1;
+
+        // Reubicar al jugador en la nueva habitación
+        player.setX(7); // Nueva posición X del jugador
+        player.setY(0); // Nueva posición Y del jugador
+        player.setMap(floor1.getMap()); // Establecer el nuevo mapa del jugador
+
+        // Añadir el jugador al nuevo mapa
+        floor1.getMap().getTile(player.getX(), player.getY()).setEntity(player);
+    }
+
+    protected void returnToPreviousRoom() {
+        if (!roomStack.isEmpty()) {
+            RoomPosition previousRoom = roomStack.pop();
+
+            entities.clear();
+
+            TileMap oldMap = currentFloor.getMap();
+            for (int x = 0; x < oldMap.getWidth(); x++) {
+                for (int y = 0; y < oldMap.getHeight(); y++) {
+                    oldMap.getTile(x, y).setEntity(null);
+                }
+            }
+
+            this.currentFloor = previousRoom.getRoom();
+
+            player.setX(previousRoom.getX());
+            player.setY(previousRoom.getY());
+            player.setMap(currentFloor.getMap());
+
+            entities.addAll(previousRoom.getEntities());
+
+            for (Entity entity : entities){
+                currentFloor.getMap().getTile(entity.getX(), entity.getY()).setEntity(entity);
+            }
+
+            currentFloor.getMap().getTile(player.getX(), player.getY()).setEntity(player);
+        }
+    }
 
     protected void updateGameLogic(float delta) {
         control.update(delta);
@@ -166,16 +237,15 @@ public class GameScreen  extends AbstractScreen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
     }
 
-
-    public void drawTitleScreen(){
+    public void drawTitleScreen() {
         batch.begin();
         batch.draw(new Texture("resources/TitleScreen/background.png"), 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         BitmapFont font = new BitmapFont();
         font.getData().setScale(1.6f);
-        String comenzar = "Press ENTER to start a new game" ;
+        String comenzar = "Press ENTER to start a new game";
         GlyphLayout layout = new GlyphLayout(font, comenzar);
         float x = (Gdx.graphics.getWidth() - layout.width) / 2;
-        float y = (Gdx.graphics.getHeight() + layout.height-200) / 2;
+        float y = (Gdx.graphics.getHeight() + layout.height - 200) / 2;
         font.draw(batch, layout, x, y);
         String cargar = "Press L to load";
         layout.setText(font, cargar);
@@ -185,20 +255,19 @@ public class GameScreen  extends AbstractScreen {
 
         batch.end();
 
-
         if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
             gamestate = GameState.HISOTRY;
         }
-        if(Gdx.input.isKeyJustPressed(Input.Keys.L)){
-            gamestate= GameState.CARGAR;
+        if (Gdx.input.isKeyJustPressed(Input.Keys.L)) {
+            gamestate = GameState.CARGAR;
         }
-
     }
 
     protected void drawGameWorld() {
         batch.begin();
         float worldStartX = Gdx.graphics.getWidth() / 2 - camara.getCamaraX();
         float worldStartY = Gdx.graphics.getHeight() / 2 - camara.getCamaraY();
+        TileMap map = currentFloor.getMap(); // Usar el mapa del cuarto actual
         for (int x = 0; x < map.getWidth(); x++) {
             for (int y = 0; y < map.getHeight(); y++) {
                 TilePrueba tile = map.getTile(x, y);
@@ -215,12 +284,12 @@ public class GameScreen  extends AbstractScreen {
 
     protected void drawEntities() {
         batch.begin();
-        for (Entity tree : entities) {
+        for (Entity entity : entities) {
             float worldStartX = Gdx.graphics.getWidth() / 2 - camara.getCamaraX();
             float worldStartY = Gdx.graphics.getHeight() / 2 - camara.getCamaraY();
-            batch.draw(tree.getSprite(),
-                    worldStartX + tree.getWorldX() * Settings.SCALED_TILE_SIZE,
-                    worldStartY + tree.getWorldY() * Settings.SCALED_TILE_SIZE,
+            batch.draw(entity.getSprite(),
+                    worldStartX + entity.getWorldX() * Settings.SCALED_TILE_SIZE,
+                    worldStartY + entity.getWorldY() * Settings.SCALED_TILE_SIZE,
                     Settings.SCALED_TILE_SIZE,
                     Settings.SCALED_TILE_SIZE * 1.5f);
         }
@@ -280,10 +349,10 @@ public class GameScreen  extends AbstractScreen {
 
         String story = "Our adventure begins on the first day of class, when our protagonist, \n" +
                 "excited to enter UCA, encounters an unexpected accident. \n" +
-                "The legendary Pokémon Owluca  has taken control of the \n entire campus and has hypnotized  all the Pokémon and professors! \n" +
+                "The legendary Pokémon Owluca has taken control of the \n entire campus and has hypnotized all the Pokémon and professors! \n" +
                 "It is our duty to stop him and restore peace to UCA. \n" +
                 "Only one student will be able to do it… \n";
-        String [] storyLines=story.split("\n");
+        String[] storyLines = story.split("\n");
         float y = (Gdx.graphics.getHeight() + (storyLines.length * 30)) / 2;
         for (String line : storyLines) {
             GlyphLayout layout = new GlyphLayout(font, line);
@@ -304,7 +373,6 @@ public class GameScreen  extends AbstractScreen {
             gamestate = GameState.GAME;
         }
     }
-
 
     public void drawPauseMenu() {
         batch.begin();
@@ -327,9 +395,9 @@ public class GameScreen  extends AbstractScreen {
 
     public void handlePauseMenuInput() {
         if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)) {
-            // Handle Bag
+            gamestate = GameState.BAG;
         } else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_2)) {
-             handleSaveGame();
+            handleSaveGame();
         } else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_3)) {
             Gdx.app.exit();
         } else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_4)) {
@@ -345,63 +413,51 @@ public class GameScreen  extends AbstractScreen {
     }
 
     public void saveGame() {
-
+        // Implementar lógica de guardado aquí
     }
-
-
 
     private void drawSaveConfirmationMessage() {
         batch.begin();
 
-        // Configurar el fondo del mensaje
-        TextureRegion background = new TextureRegion(new Texture(Gdx.files.internal("resources/Dialog/Message.png"))); // Reemplaza "background.png" con tu imagen de fondo
-        float bgWidth = Gdx.graphics.getWidth() * 0.8f; // Ancho del fondo
-        float bgHeight = 60; // Alto del fondo
-        float bgX = (Gdx.graphics.getWidth() - bgWidth) / 2; // Posición X del fondo
-        float bgY = Gdx.graphics.getHeight() / 2 - bgHeight / 2; // Posición Y del fondo
+        TextureRegion background = new TextureRegion(new Texture(Gdx.files.internal("resources/Dialog/Message.png")));
+        float bgWidth = Gdx.graphics.getWidth() * 0.8f;
+        float bgHeight = 60;
+        float bgX = (Gdx.graphics.getWidth() - bgWidth) / 2;
+        float bgY = Gdx.graphics.getHeight() / 2 - bgHeight / 2;
         batch.draw(background, bgX, bgY, bgWidth, bgHeight);
 
-        // Configurar el texto
         BitmapFont font = new BitmapFont();
         font.getData().setScale(1.0f);
         font.setColor(0, 0, 0, 1);
         GlyphLayout layout = new GlyphLayout(font, "Game saved successfully!");
-        float textX = (Gdx.graphics.getWidth() - layout.width) / 2; // Posición X del texto
-        float textY = Gdx.graphics.getHeight() / 2 + layout.height / 2; // Posición Y del texto
+        float textX = (Gdx.graphics.getWidth() - layout.width) / 2;
+        float textY = Gdx.graphics.getHeight() / 2 + layout.height / 2;
         font.draw(batch, layout, textX, textY);
 
         batch.end();
     }
 
-public void drawBag(){
-        /*
-    batch.begin();
+    public void drawBag() {
+        batch.begin();
 
-    // Dibujar la imagen del bolso (bag)
-    Texture bagImage = new Texture(""); // Reemplaza con la ruta de tu imagen
-    float bagX = (Gdx.graphics.getWidth() - bagImage.getWidth()) / 2;
-    float bagY = (Gdx.graphics.getHeight() - bagImage.getHeight()) / 2;
-    batch.draw(bagImage, bagX, bagY);
+        // Dibujar la imagen del bolso (bag)
+        Texture bagImage = new Texture("resources/bag.png"); // Reemplaza con la ruta de tu imagen
+        float bagX = (Gdx.graphics.getWidth() - bagImage.getWidth()) / 2;
+        float bagY = (Gdx.graphics.getHeight() - bagImage.getHeight()) / 2;
+        batch.draw(bagImage, bagX, bagY);
 
-    // Dibujar texto para volver al menú principal
-    BitmapFont font = new BitmapFont();
-    font.getData().setScale(1.2f);
-    GlyphLayout layout = new GlyphLayout(font, "Press ESC to return to main menu");
-    float textX = (Gdx.graphics.getWidth() - layout.width) / 2;
-    float textY = 50;
-    font.draw(batch, layout, textX, textY);
+        // Dibujar texto para volver al menú principal
+        BitmapFont font = new BitmapFont();
+        font.getData().setScale(1.2f);
+        GlyphLayout layout = new GlyphLayout(font, "Press ESC to return to main menu");
+        float textX = (Gdx.graphics.getWidth() - layout.width) / 2;
+        float textY = 50;
+        font.draw(batch, layout, textX, textY);
 
-    batch.end();
+        batch.end();
 
-    if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
-        gamestate = GameState.PAUSE;
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+            gamestate = GameState.PAUSE;
+        }
     }
-
-         */
 }
-}
-
-
-
-
-

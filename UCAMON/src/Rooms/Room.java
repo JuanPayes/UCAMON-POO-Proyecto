@@ -22,4 +22,6 @@ public abstract class Room {
     public List<Entity> getEntities() {
         return entities;
     }
+
+    public abstract String getId();
 }
