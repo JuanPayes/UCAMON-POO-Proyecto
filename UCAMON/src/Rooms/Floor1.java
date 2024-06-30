@@ -10,19 +10,23 @@ import java.util.List;
 public class Floor1 extends Room{
 
     Texture floorTexture;
+    TileMap floor;
 
-    public Floor1(TileMap map, List<Entity> entities) {
-        super(map, entities);
+    public Floor1(List<Entity> entities) {
+        super(null, entities);
     }
 
     @Override
     public void initialize() {
-        floorTexture = new Texture("resoureces/Tiles/Floors/LibFloor.png");
+        floorTexture = new Texture("resources/Tiles/Floors/LibFloor.png");
 
-        for (int x = 0; x < map.getWidth(); x++) {
-            for (int y = 0; y < map.getHeight(); y++) {
-                map.setTile(x, y, new TextureRegion(floorTexture));
+        floor = new TileMap(15, 15, floorTexture);
+
+        for (int x = 0; x < floor.getWidth(); x++) {
+            for (int y = 0; y < floor.getHeight(); y++) {
+                floor.setTile(x, y, new TextureRegion(floorTexture));
             }
         }
+        this.map = floor;
     }
 }

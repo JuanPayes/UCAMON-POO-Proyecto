@@ -156,4 +156,8 @@ public class Entity {
     public float getWorldY(){
         return worldY;
     }
+
+    public void setMap(TileMap map) {
+        this.map = map;
+    }
 }

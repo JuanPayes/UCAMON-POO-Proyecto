@@ -1,5 +1,6 @@
 package Screen;
 
+import Rooms.Floor1;
 import Rooms.OverWorld;
 import Rooms.Room;
 import Util.AnimationSet;
@@ -42,8 +43,6 @@ public class GameScreen extends AbstractScreen {
     private float saveConfirmationTime;
     private String saveMessage;
 
-    private TileMap map;
-
     public GameScreen(Pokemon app) {
         super(app);
         this.gamestate = GameState.TITLESCREEN;
@@ -81,21 +80,19 @@ public class GameScreen extends AbstractScreen {
                 atlas.findRegion("RedStanding_West")
         );
 
-        map = new TileMap(20, 36, new Texture("resources/Tiles/grass.png")); // Usar la textura correcta
-
-        player = new Entity(map, 10, 1, animations);
-        camara = new Camara();
-
-        control = new PlayerController(player);
-
+        // Inicializar la lista de entidades
         entities = new ArrayList<>();
 
         // Crear e inicializar OverWorld
-        OverWorld overWorld = new OverWorld(map, entities);
+        OverWorld overWorld = new OverWorld(new TileMap(20, 36, new Texture("resources/Tiles/grass.png")), entities);
         overWorld.initialize();
 
+        // Establecer el cuarto actual como OverWorld
         this.currentFloor = overWorld;
 
+        // Crear el jugador y establecer su controlador
+        player = new Entity(currentFloor.getMap(), 10, 1, animations);
+        camara = new Camara();
         control = new PlayerController(player);
     }
 
@@ -113,6 +110,11 @@ public class GameScreen extends AbstractScreen {
                 gamestate = GameState.GAME;
             }
         }
+
+        if (gamestate == GameState.GAME && player.getX() == 10 && player.getY() == 30 && Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
+            changeRoom();
+        }
+
         switch (gamestate) {
             case TITLESCREEN:
                 intro.play();
@@ -152,6 +154,34 @@ public class GameScreen extends AbstractScreen {
                 showSaveConfirmation = false;
             }
         }
+    }
+
+    protected void changeRoom() {
+        // Limpiar entidades del cuarto actual
+        entities.clear();
+
+        // Limpiar entidades del mapa actual
+        TileMap oldMap = currentFloor.getMap();
+        for (int x = 0; x < oldMap.getWidth(); x++) {
+            for (int y = 0; y < oldMap.getHeight(); y++) {
+                oldMap.getTile(x, y).setEntity(null);
+            }
+        }
+
+        // Crear e inicializar NewRoom
+        Floor1 floor1 = new Floor1(entities);
+        floor1.initialize();
+
+        // Establecer el cuarto actual como NewRoom
+        this.currentFloor = floor1;
+
+        // Reubicar al jugador en la nueva habitación
+        player.setX(7); // Nueva posición X del jugador
+        player.setY(0); // Nueva posición Y del jugador
+        player.setMap(floor1.getMap()); // Establecer el nuevo mapa del jugador
+
+        // Añadir el jugador al nuevo mapa
+        floor1.getMap().getTile(player.getX(), player.getY()).setEntity(player);
     }
 
     protected void updateGameLogic(float delta) {
@@ -195,6 +225,7 @@ public class GameScreen extends AbstractScreen {
         batch.begin();
         float worldStartX = Gdx.graphics.getWidth() / 2 - camara.getCamaraX();
         float worldStartY = Gdx.graphics.getHeight() / 2 - camara.getCamaraY();
+        TileMap map = currentFloor.getMap(); // Usar el mapa del cuarto actual
         for (int x = 0; x < map.getWidth(); x++) {
             for (int y = 0; y < map.getHeight(); y++) {
                 TilePrueba tile = map.getTile(x, y);
