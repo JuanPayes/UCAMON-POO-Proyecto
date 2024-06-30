@@ -11,13 +11,10 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import controller.PlayerController;
 import entity.*;
 import main.Pokemon;
 import main.Settings;
-
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -30,18 +27,14 @@ public class GameScreen  extends AbstractScreen {
     private Entity player;
     private Texture playerStandingSouth;
     private SpriteBatch batch;
-
     private GameState gamestate;
-
-
     private List<TextureRegion> pilar;
-
     private List<TextureRegion> store;
     private List<TextureRegion> center;
     private List<TextureRegion> trees;
     private List<Entity> entities;
     private List<TextureRegion> librery;
-
+    private Music HealingEffect;
     private Music adventureTrack;
     private Music intro;
     private Music easterEgg;
@@ -49,7 +42,7 @@ public class GameScreen  extends AbstractScreen {
     private boolean showSaveConfirmation;
     private float saveConfirmationTime;
     private String saveMessage;
-
+    private boolean hasPlayedHealingEffect = false;
     private TextureRegion[] treeTexture;
     private Texture Grass1, brownGrass1, brownGrass2, brownGrass3, HighGrass, road, northRoad, southRoad, brownGrass4, brownGrass5, brownGrass6, brownGrass7;
     private Texture pea1, pea2, pea3, pea4, pea5, pea6;
@@ -77,6 +70,9 @@ public class GameScreen  extends AbstractScreen {
     menu = Gdx.audio.newMusic(Gdx.files.internal("resources/Music/Menu.mp3"));
     menu.setLooping(true);
     menu.setVolume(0.1f);
+
+    HealingEffect = Gdx.audio.newMusic(Gdx.files.internal("resources/Music/HealingEffect.mp3"));
+    HealingEffect.setVolume(1f);
 
 
 
@@ -379,24 +375,41 @@ public class GameScreen  extends AbstractScreen {
                 drawStoryScreen();
                 break;
             case GAME:
+                hasPlayedHealingEffect=false;
                 menu.pause();
                 adventureTrack.play();
+                adventureTrack.setVolume(0.1f);
                 updateGameLogic(delta);
                 clearScreen();
                 drawGameWorld();
                 drawEntities();
                 drawPlayer();
+                checkForStoreInteraction();
+                checkForPCenterInteraction();
+
                 break;
             case CARGAR:
 
                 break;
             case PAUSE:
-                adventureTrack.pause();
+                adventureTrack.setVolume(0.03f);
                 drawPauseMenu();
                 break;
             case BAG:
+                adventureTrack.setVolume(0.03f);
                 drawBag();
                 break;
+            case STORE:
+                adventureTrack.setVolume(0.03f);
+                drawStore();
+                break;
+            case PCENTER:
+                if (!hasPlayedHealingEffect) {
+                    HealingEffect.play();
+                    hasPlayedHealingEffect = true;
+                }
+                adventureTrack.setVolume(0.03f);
+                drawPCenter();
             default:
                 break;
         }
@@ -499,7 +512,6 @@ public class GameScreen  extends AbstractScreen {
                 Settings.SCALED_TILE_SIZE * 1.5f);
         batch.end();
     }
-
     private void updateCamera() {
         float playerWorldX = player.getWorldX() * Settings.SCALED_TILE_SIZE + Settings.SCALED_TILE_SIZE / 2;
         float playerWorldY = player.getWorldY() * Settings.SCALED_TILE_SIZE + Settings.SCALED_TILE_SIZE / 2;
@@ -572,6 +584,8 @@ public class GameScreen  extends AbstractScreen {
 
     public void drawPauseMenu() {
         batch.begin();
+        Texture background = new Texture(Gdx.files.internal("resources/Bag/PauseDesign.png"));
+        batch.draw(background, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         BitmapFont font = new BitmapFont();
         font.getData().setScale(1.6f);
 
@@ -640,7 +654,7 @@ public class GameScreen  extends AbstractScreen {
 public void drawBag(){
 gamestate=GameState.BAG;
     batch.begin();
-    TextureRegion bagImage = new TextureRegion(new Texture(Gdx.files.internal("resources/Bag/Bag.png")));
+    TextureRegion bagImage = new TextureRegion(new Texture(Gdx.files.internal("resources/Bag/BagDesign.png")));
 
     // Obtener las dimensiones originales de la imagen
     float imageWidth = bagImage.getRegionWidth();
@@ -658,17 +672,27 @@ gamestate=GameState.BAG;
     float scaledHeight = imageHeight * scale;
 
     // Calcular la posición para centrar la imagen escalada en la pantalla
-    float bgX = (screenWidth - scaledWidth) / 2; // Posición X centrada
+    float bgX = (screenWidth - scaledWidth) / 2; // Posición X centrad
     float bgY = (screenHeight - scaledHeight) / 2; // Posición Y centrada
 
     // Dibujar la imagen del bolso escalada
     batch.draw(bagImage, bgX, bgY, scaledWidth, scaledHeight);
-
-
-
-
     BitmapFont font = new BitmapFont();
     font.getData().setScale(1.2f);
+    int pokeballCount = 10;
+    int potionCount = 5;
+    Texture pokeballImage = new Texture(Gdx.files.internal("resources/MenuSprites/pokeball.png"));
+    float pokeballX = 249;
+    float pokeballY = screenHeight - 60;
+    batch.draw(pokeballImage, pokeballX, pokeballY);
+    GlyphLayout pokeballLayout = new GlyphLayout(font, "x" + pokeballCount);
+    font.draw(batch, pokeballLayout, pokeballX + pokeballImage.getWidth() + 10, pokeballY + pokeballImage.getHeight() / 2 + pokeballLayout.height / 2);
+    Texture potionImage = new Texture(Gdx.files.internal("resources/MenuSprites/potion.png"));
+    float potionX = 249;
+    float potionY = pokeballY - 40; // Ajusta la posición Y según sea necesario
+    batch.draw(potionImage, potionX, potionY);
+    GlyphLayout potionLayout = new GlyphLayout(font, "x" + potionCount);
+    font.draw(batch, potionLayout, potionX + potionImage.getWidth() + 10, potionY + potionImage.getHeight() / 2 + potionLayout.height / 2);
     GlyphLayout layout = new GlyphLayout(font, "Press ESC to return to main menu");
     float textX = (Gdx.graphics.getWidth() - layout.width) / 2;
     float textY = 50;
@@ -682,6 +706,171 @@ gamestate=GameState.BAG;
 
 
 }
+    private void checkForStoreInteraction() {
+        float playerX = player.getWorldX();
+        float playerY = player.getWorldY();
+
+
+        int storeEntranceX = 4;
+        int storeEntranceY = 11;
+
+        if (playerX == storeEntranceX && playerY == storeEntranceY) {
+            drawStorePrompt();
+            if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
+                gamestate = GameState.STORE;
+            }
+        }
+    }
+    private void drawStorePrompt() {
+        batch.begin();
+        BitmapFont font = new BitmapFont();
+        font.getData().setScale(1.7f);
+        GlyphLayout layout = new GlyphLayout(font, "Press ENTER to enter the store");
+        float screenWidth = Gdx.graphics.getWidth();
+        float screenHeight = Gdx.graphics.getHeight();
+        float textX = (screenWidth - layout.width) / 2;
+        float textY = screenHeight * 0.1f;
+        font.draw(batch, layout, textX, textY);
+        batch.end();
+    }
+
+    public void drawStore() {
+        batch.begin();
+        String pokeballCount = "prize";
+        String potionCount = "prize";
+        TextureRegion bagImage = new TextureRegion(new Texture(Gdx.files.internal("resources/Bag/StoreDesign.png")));
+
+        // Obtener las dimensiones originales de la imagen
+        float imageWidth = bagImage.getRegionWidth();
+        float imageHeight = bagImage.getRegionHeight();
+
+        // Dimensiones de la pantalla
+        float screenWidth = Gdx.graphics.getWidth();
+        float screenHeight = Gdx.graphics.getHeight();
+
+        // Calcular el factor de escala para ajustar la imagen dentro de la pantalla manteniendo la proporción
+        float scale = Math.min(screenWidth / imageWidth, screenHeight / imageHeight);
+
+        // Calcular el nuevo tamaño de la imagen escalada
+        float scaledWidth = imageWidth * scale;
+        float scaledHeight = imageHeight * scale;
+
+        // Calcular la posición para centrar la imagen escalada en la pantalla
+        float bgX = (screenWidth - scaledWidth) / 2; // Posición X centrad
+        float bgY = (screenHeight - scaledHeight) / 2; // Posición Y centrada
+
+        // Dibujar la imagen del bolso escalada
+        batch.draw(bagImage, bgX, bgY, scaledWidth, scaledHeight);
+
+        Texture pokeballImage = new Texture(Gdx.files.internal("resources/MenuSprites/pokeball.png"));
+        float pokeballX = 249;
+        float pokeballY = Gdx.graphics.getHeight() - 60;
+        batch.draw(pokeballImage, pokeballX, pokeballY);
+        BitmapFont font = new BitmapFont();
+        font.getData().setScale(1.2f);
+        GlyphLayout pokeballLayout = new GlyphLayout(font, "x" + pokeballCount);
+        font.draw(batch, pokeballLayout, pokeballX + pokeballImage.getWidth() + 10, pokeballY + pokeballImage.getHeight() / 2 + pokeballLayout.height / 2);
+
+        // Dibujar Poción
+        Texture potionImage = new Texture(Gdx.files.internal("resources/MenuSprites/potion.png"));
+        float potionX = 249;
+        float potionY = pokeballY - 40; // Ajusta la posición Y según sea necesario
+        batch.draw(potionImage, potionX, potionY);
+        GlyphLayout potionLayout = new GlyphLayout(font, "x" + potionCount);
+        font.draw(batch, potionLayout, potionX + potionImage.getWidth() + 10, potionY + potionImage.getHeight() / 2 + potionLayout.height / 2);
+
+        // Mensaje de retorno
+        GlyphLayout layout = new GlyphLayout(font, "Press ESC to return to main menu");
+        float textX = (Gdx.graphics.getWidth() - layout.width) / 2;
+        float textY = 50;
+        font.draw(batch, layout, textX, textY);
+
+        batch.end();
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+            gamestate = GameState.GAME;
+        }
+    }
+
+
+    public void checkForPCenterInteraction() {
+        float playerX = player.getWorldX();
+        float playerY = player.getWorldY();
+
+        int PCenterEntranceX = 4; // Verifica que esta coordenada sea correcta
+        int PCenterEntranceY = 16; // Verifica que esta coordenada sea correcta
+
+        if (playerX == PCenterEntranceX && playerY == PCenterEntranceY) {
+            drawPCenterPrompt();
+            if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
+                gamestate = GameState.PCENTER;
+            }
+        }
+
+    }
+
+    private void drawPCenterPrompt() {
+        batch.begin();
+        BitmapFont font = new BitmapFont();
+        font.getData().setScale(1.7f);
+        GlyphLayout layout = new GlyphLayout(font, "Press ENTER to enter Pokemon center");
+
+        float screenWidth = Gdx.graphics.getWidth();
+        float screenHeight = Gdx.graphics.getHeight();
+        float textX = (screenWidth - layout.width) / 2;
+        float textY = screenHeight * 0.1f;
+
+        // Dibujar el texto
+        font.draw(batch, layout, textX, textY);
+        batch.end();
+    }
+
+    public void drawPCenter() {
+        batch.begin();
+        TextureRegion PCenterImage = new TextureRegion(new Texture(Gdx.files.internal("resources/Bag/TextBoxDesign.png")));
+
+        float imageWidth = PCenterImage.getRegionWidth();
+        float imageHeight = PCenterImage.getRegionHeight();
+
+        float screenWidth = Gdx.graphics.getWidth();
+        float screenHeight = Gdx.graphics.getHeight();
+
+        float scale = Math.min(screenWidth / imageWidth, screenHeight / imageHeight);
+
+        float scaledWidth = imageWidth * scale;
+        float scaledHeight = imageHeight * scale;
+
+        float bgX = (screenWidth - scaledWidth) / 2; // Posición X centrada
+        float bgY = (screenHeight - scaledHeight) / 2; // Posición Y centrada
+
+        batch.draw(PCenterImage, bgX, bgY, scaledWidth, scaledHeight);
+        BitmapFont font = new BitmapFont();
+        font.getData().setScale(1.2f);
+        BitmapFont font2 = new BitmapFont();
+        font2.getData().setScale(1.2f);
+        font2.setColor(0,0,0,1);
+
+
+        // Texto en la parte inferior
+        GlyphLayout layoutBottom = new GlyphLayout(font, "Press ESC to return to the game");
+        float textBottomX = (Gdx.graphics.getWidth() - layoutBottom.width) / 2;
+        float textBottomY = 50;
+        font.draw(batch, layoutBottom, textBottomX, textBottomY);
+
+        // Texto en el centro
+        GlyphLayout layoutCenter = new GlyphLayout(font2, "All Pokémon have been healed!");
+        float textCenterX = bgX + (scaledWidth - layoutCenter.width) / 2;
+        float textCenterY = bgY + (scaledHeight + layoutCenter.height) / 2;
+        font.draw(batch, layoutCenter, textCenterX, textCenterY);
+
+        batch.end();
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+            gamestate = GameState.GAME;
+        }
+    }
+
+
 }
 
 
