@@ -2,7 +2,7 @@ package Util;
 
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import entity.DIRECTION;
+
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,6 +30,6 @@ public class AnimationSet {
     }
 
     public TextureRegion getStandingAnimation(DIRECTION dir) {
-return standing.get(dir);
+        return standing.get(dir);
     }
 }

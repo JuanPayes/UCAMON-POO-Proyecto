@@ -1,0 +1,20 @@
+<component name="libraryTable">
+  <library name="gdx-backend-lwjgl-natives">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/src/Lib/gdx-backend-lwjgl-natives.jar!/" />
+      <root url="jar://$PROJECT_DIR$/src/Lib/gdx-freetype-natives.jar!/" />
+      <root url="jar://$PROJECT_DIR$/src/Lib/gdx-backend-lwjgl.jar!/" />
+      <root url="jar://$PROJECT_DIR$/src/Lib/tween-engine-api.jar!/" />
+      <root url="jar://$PROJECT_DIR$/src/Lib/gdx.jar!/" />
+      <root url="jar://$PROJECT_DIR$/src/Lib/gdx-tools.jar!/" />
+      <root url="jar://$PROJECT_DIR$/src/Lib/gdx-natives.jar!/" />
+      <root url="jar://$PROJECT_DIR$/src/Lib/gdx-freetype.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/src/Lib/tween-engine-api-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/src/Lib/gdx-sources.jar!/" />
+      <root url="file://$PROJECT_DIR$/src" />
+    </SOURCES>
+  </library>
+</component>

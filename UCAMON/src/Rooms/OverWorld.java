@@ -1,7 +1,8 @@
 package Rooms;
 
-import entity.TileMap;
-import entity.Entity;
+
+import Entities.RenderableEntity;
+import Tiles.TileMap;
 import Util.AnimationSet;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -18,7 +19,7 @@ public class OverWorld extends Room {
     private List<TextureRegion> trees;
     private List<TextureRegion> librery;
 
-    public OverWorld(TileMap map, List<Entity> entities) {
+    public OverWorld(TileMap map, List<RenderableEntity> entities) {
         super(map, entities);
     }
 
@@ -108,6 +109,11 @@ public class OverWorld extends Room {
         // Añadir entidad del jugador
     }
 
+    @Override
+    public String getID() {
+        return "OverWorld";
+    }
+
     private void addTree(TileMap map, int x, int y) {
         int[][] treeCoords = {
                 {x, y},
@@ -118,7 +124,7 @@ public class OverWorld extends Room {
                 {x + 1, y - 2}
         };
         for (int i = 0; i < 6; i++) {
-            entities.add(new Entity(map, treeCoords[i][0], treeCoords[i][1], trees.get(i)));
+            entities.add(new RenderableEntity(map, treeCoords[i][0], treeCoords[i][1], trees.get(i)));
         }
     }
 
@@ -132,7 +138,7 @@ public class OverWorld extends Room {
                 {x + 1, y - 2},
         };
         for (int i = 0; i < 6; i++) {
-            entities.add(new Entity(map, pilarCoords[i][0],pilarCoords[i][1], pilar.get(i)));
+            entities.add(new RenderableEntity(map, pilarCoords[i][0],pilarCoords[i][1], pilar.get(i)));
         }
     }
 
@@ -257,7 +263,7 @@ public class OverWorld extends Room {
     }
 
     private void addTile(TileMap map, int x, int y, TextureRegion tile) {
-        Entity buildingTile = new Entity(map, x, y, tile);
+        RenderableEntity buildingTile = new RenderableEntity(map, x, y, tile);
         entities.add(buildingTile);
     }
 }
